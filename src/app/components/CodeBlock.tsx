@@ -1,23 +1,27 @@
 "use client";
 import { ComponentProps } from "react";
 import { IBM_Plex_Mono } from "next/font/google";
-import { CodeBlock as CodeBlockLib, atomOneDark } from "react-code-blocks";
+import { CodeBlock as CodeBlockLib, atomOneLight } from "react-code-blocks";
 import { Stack } from "@mui/joy";
+import ClientOnly from "./ClientOnly";
 
 const ibm = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: "300",
+  weight: "500",
   fallback: ["monospace"],
 });
 
 function CodeBlock({
-  theme = atomOneDark,
+  theme = atomOneLight,
+  children,
   ...props
-}: ComponentProps<typeof CodeBlockLib>) {
+}: Omit<ComponentProps<typeof CodeBlockLib>, "text"> & { children: string }) {
   return (
-    <Stack className={ibm.className}>
-      <CodeBlockLib {...props} theme={theme} />
-    </Stack>
+    <ClientOnly>
+      <Stack className={ibm.className}>
+        <CodeBlockLib {...props} theme={theme} text={children} />
+      </Stack>
+    </ClientOnly>
   );
 }
 

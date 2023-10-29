@@ -1,4 +1,5 @@
 "use client";
+import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import Color from "color";
 import { useWindowSize } from "@uidotdev/usehooks";
@@ -7,6 +8,7 @@ import useAnimationFrame from "../hooks/useAnimationFrame";
 import Image from "next/image";
 import outline from "../../../public/outline1.png";
 import { Box } from "@mui/joy";
+import ClientOnly from "./ClientOnly";
 
 // https://codepen.io/rlemon/pen/DdEjw
 
@@ -27,9 +29,9 @@ class Particle {
     this.depth = randomBetween(0.1, 10);
     this.size = (this.depth + 1) / 8;
 
-    const slowVelocity = 0.35;
-    const fastVelocity = 0.7;
-    const ludicrousVelocity = 2;
+    const slowVelocity = randomBetween(3, 4) / 10;
+    const fastVelocity = randomBetween(7, 8) / 10;
+    const ludicrousVelocity = randomBetween(18, 21) / 10;
     // 70% of stars don't move, 30% do move
     this.moveable = randomBetween(0, 100) > 70;
     // 80% of stars move slowly, 15% move fast, 5% move ludicrously fast
@@ -58,10 +60,12 @@ class Particle {
 }
 
 function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
-  const [{ particles }, setState] = useState<{
+  const [{ particles, loading }, setState] = useState<{
     particles: Particle[];
+    loading: boolean;
   }>({
     particles: [],
+    loading: true,
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const outlineRef = useRef<HTMLImageElement>(null);
@@ -94,19 +98,19 @@ function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
       context!.fillRect(0, 0, width, height);
 
       //draw outline
-      if (outlineRef.current) {
-        const ratio = outlineRef.current.width / outlineRef.current.height;
-        const imageHeight = height * 0.8;
-        const imageWidth = imageHeight * ratio;
-        context!.globalAlpha = 1;
-        context!.drawImage(
-          outlineRef.current,
-          -100,
-          height - imageHeight,
-          imageWidth,
-          imageHeight
-        );
-      }
+      // if (outlineRef.current) {
+      //   const ratio = outlineRef.current.width / outlineRef.current.height;
+      //   const imageHeight = height * 0.8;
+      //   const imageWidth = imageHeight * ratio;
+      //   context!.globalAlpha = 1;
+      //   context!.drawImage(
+      //     outlineRef.current,
+      //     -100,
+      //     height - imageHeight,
+      //     imageWidth,
+      //     imageHeight
+      //   );
+      // }
 
       // draw vertical slide gradient
       context!.globalAlpha = 0.8;
@@ -127,16 +131,16 @@ function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
       // draw radial bottom gradient
       gradient = context!.createRadialGradient(
         width / 2 + 30,
-        height + 250,
+        height * 0.8,
         1,
         width / 2 + 30,
         height + 50,
-        width * 0.9
+        height * 1.3
       );
       gradient.addColorStop(0, "rgba(10,128,121,50)");
       gradient.addColorStop(1, "rgba(10,128,121,0)");
       context!.fillStyle = gradient;
-      context!.globalAlpha = 0.5;
+      context!.globalAlpha = 0.4;
       context!.fillRect(0, 0, width, height);
 
       // update stars
@@ -167,19 +171,41 @@ function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
       }
 
       context!.putImageData(imageData, 0, 0);
+      if (loading) {
+        setState((state) => ({ ...state, loading: false }));
+      }
     }
   });
 
   return (
-    <Box zIndex={1} position="fixed" top={0} left={0}>
-      <canvas ref={canvasRef} width={String(width)} height={String(height)} />
-      <Image
-        ref={outlineRef}
-        src={outline}
-        alt=""
-        style={{ visibility: "hidden" }}
-      />
-    </Box>
+    <ClientOnly>
+      <Box
+        sx={{
+          zIndex: 1,
+          position: "fixed",
+          top: 0,
+          left: 0,
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          width={String(width)}
+          height={String(height)}
+          style={{
+            zIndex: 1,
+            transition: "opacity 0.2s",
+            opacity: 0,
+            ...(!loading && { opacity: 1 }),
+          }}
+        />
+        {/* <Image
+          ref={outlineRef}
+          src={outline}
+          alt=""
+          style={{ visibility: "hidden" }}
+        /> */}
+      </Box>
+    </ClientOnly>
   );
 }
 

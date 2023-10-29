@@ -6,6 +6,7 @@ import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import theme from "./theme";
 import { useState } from "react";
+import { GlobalStyles } from "@mui/joy";
 
 // This implementation is from emotion-js
 // https://github.com/emotion-js/emotion/issues/2928#issuecomment-1319747902
@@ -55,8 +56,29 @@ export default function ThemeRegistry(props: { options: any; children: any }) {
   return (
     <CacheProvider value={cache}>
       <CssVarsProvider theme={theme}>
-        {/* the custom theme is optional */}
         <CssBaseline />
+        <GlobalStyles
+          styles={{
+            html: {
+              minHeight: "100vh",
+              width: "100vw",
+            },
+            body: {
+              minHeight: "100vh",
+              width: "100vw",
+              background:
+                "linear-gradient(0deg, rgba(1,42,123,1) 0%, rgba(4,0,25,1) 100%)",
+              WebkitFontSmoothing: "antialiased",
+              MozOsxFontSmoothing: "grayscale",
+              overflowX: "hidden",
+              overflowY: "scroll",
+              scrollbarColor: "#fff",
+              "&::-webkit-scrollbar, & *::-webkit-scrollbar": {
+                width: 0,
+              },
+            },
+          }}
+        />
         {children}
       </CssVarsProvider>
     </CacheProvider>
