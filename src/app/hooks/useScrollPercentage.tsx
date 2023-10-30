@@ -5,9 +5,10 @@ import { debounce } from "../util/timing";
 export default function useScrollPercentage() {
   const [percent, setPercent] = useState(0);
   useEffect(() => {
+    const callback = () => setPercent(scrollTop());
     const [onScroll, cleanupOnScroll] = debounce(
-      () => setPercent(scrollTop()),
-      10
+      () => window.requestAnimationFrame(callback),
+      5
     );
     document.addEventListener("scroll", onScroll);
     return () => {

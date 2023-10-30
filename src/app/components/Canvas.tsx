@@ -1,14 +1,12 @@
 "use client";
-import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import Color from "color";
-import { useWindowSize } from "@uidotdev/usehooks";
 import { randomBetween } from "../util/math";
 import useAnimationFrame from "../hooks/useAnimationFrame";
-import Image from "next/image";
-import outline from "../../../public/outline1.png";
 import { Box } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
+import useOnWindowSizeChange from "../hooks/useOnWindowSizeChange";
+import { documentHeight } from "../util/dom";
 
 // https://codepen.io/rlemon/pen/DdEjw
 
@@ -20,8 +18,9 @@ class Particle {
   depth = 0;
   vy = 0;
   vx = 0.1;
+  brightness = 1;
   moveable = true;
-  color = [255, 255, 255];
+  drawn = false;
 
   create(width: number, height: number) {
     this.x = this.oX = Math.random() * width;
@@ -29,11 +28,24 @@ class Particle {
     this.depth = randomBetween(0.1, 10);
     this.size = (this.depth + 1) / 8;
 
+    const lowBrightness = randomBetween(2, 4) / 10;
+    const highBrightness = randomBetween(7, 8) / 10;
+    const maxBrightness = randomBetween(9.3, 10) / 10;
+    const brightnessP = randomBetween(0, 100);
+    // 20% of stats are low brightness, 70% high brightness, 10% max brightness
+    if (brightnessP <= 20) {
+      this.brightness = lowBrightness;
+    } else if (brightnessP > 20 && brightnessP < 90) {
+      this.brightness = highBrightness;
+    } else {
+      this.brightness = maxBrightness;
+    }
+
     const slowVelocity = randomBetween(3, 4) / 10;
     const fastVelocity = randomBetween(7, 8) / 10;
     const ludicrousVelocity = randomBetween(18, 21) / 10;
-    // 70% of stars don't move, 30% do move
-    this.moveable = randomBetween(0, 100) > 70;
+    // 70% of stars don't move, 10% do move
+    this.moveable = randomBetween(0, 100) > 90;
     // 80% of stars move slowly, 15% move fast, 5% move ludicrously fast
 
     const velocityP = randomBetween(0, 100);
@@ -47,6 +59,9 @@ class Particle {
   }
 
   update(width: number, height: number) {
+    if (!this.drawn) {
+      this.drawn = true;
+    }
     if (!this.moveable) {
       return;
     }
@@ -59,17 +74,19 @@ class Particle {
   }
 }
 
-function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
-  const [{ particles, loading }, setState] = useState<{
+function Canvas({ pxPerStar = 5000 }: { pxPerStar?: number }) {
+  const [{ particles, loading, backgroundImageData }, setState] = useState<{
     particles: Particle[];
     loading: boolean;
+    backgroundImageData: ImageData | undefined;
   }>({
     particles: [],
     loading: true,
+    backgroundImageData: undefined,
   });
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const outlineRef = useRef<HTMLImageElement>(null);
-  const { width, height } = useWindowSize();
+  const starsRef = useRef<HTMLCanvasElement>(null);
+  const backgroundRef = useRef<HTMLCanvasElement>(null);
+  const { width, height, didChange } = useOnWindowSizeChange();
 
   useEffect(() => {
     if (width && height && particles.length === 0) {
@@ -84,98 +101,161 @@ function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
     }
   }, [width, height, particles.length, pxPerStar]);
 
+  // update stars
   useAnimationFrame(() => {
     const currentWidth = width || 0;
     const currentHeight = height || 0;
-    if (canvasRef.current && width && height) {
-      const context = canvasRef.current.getContext("2d");
-
-      // draw base gradient
-      let gradient = context!.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, "rgb(4,0,25)");
-      gradient.addColorStop(1, "rgb(1,42,123)");
-      context!.fillStyle = gradient;
-      context!.fillRect(0, 0, width, height);
-
-      //draw outline
-      // if (outlineRef.current) {
-      //   const ratio = outlineRef.current.width / outlineRef.current.height;
-      //   const imageHeight = height * 0.8;
-      //   const imageWidth = imageHeight * ratio;
-      //   context!.globalAlpha = 1;
-      //   context!.drawImage(
-      //     outlineRef.current,
-      //     -100,
-      //     height - imageHeight,
-      //     imageWidth,
-      //     imageHeight
-      //   );
-      // }
-
-      // draw vertical slide gradient
-      context!.globalAlpha = 0.8;
-      gradient = context!.createLinearGradient(
-        width * 0.5 + 500,
-        -200,
-        width * 0.5 - 700,
-        0
-      );
-      gradient.addColorStop(0.5, "rgb(160,7,198)");
-      gradient.addColorStop(0.53, "rgb(160,7,198)");
-      gradient.addColorStop(0.47, "rgb(160,7,198)");
-      gradient.addColorStop(0.1, "rgba(155,1,157,0");
-      gradient.addColorStop(0.9, "rgba(155,1,157,0");
-      context!.fillStyle = gradient;
-      context!.fillRect(0, 0, width, height);
-
-      // draw radial bottom gradient
-      gradient = context!.createRadialGradient(
-        width / 2 + 30,
-        height * 0.8,
-        1,
-        width / 2 + 30,
-        height + 50,
-        height * 1.3
-      );
-      gradient.addColorStop(0, "rgba(10,128,121,50)");
-      gradient.addColorStop(1, "rgba(10,128,121,0)");
-      context!.fillStyle = gradient;
-      context!.globalAlpha = 0.4;
-      context!.fillRect(0, 0, width, height);
-
-      // update stars
-      const imageData = context!.getImageData(
+    if (
+      starsRef.current &&
+      backgroundRef.current &&
+      width &&
+      height &&
+      backgroundImageData
+    ) {
+      const stars = starsRef.current.getContext("2d");
+      const starsImageData = stars!.getImageData(
         0,
         0,
         currentWidth,
         currentHeight
       );
+
       for (let i = 0, l = particles.length; i < l; i++) {
         const particle = particles[i];
-        for (let w = 0; w < particle.size; w++) {
-          for (let h = 0; h < particle.size; h++) {
-            const pData =
-              (~~(particle.x + w) + ~~(particle.y + h) * currentWidth) * 4;
-            const currentPixel = Color([
-              imageData.data[pData],
-              imageData.data[pData + 1],
-              imageData.data[pData + 2],
-            ]);
-            const nextPixel = currentPixel.lighten(0.6);
-            imageData.data[pData] = nextPixel.red();
-            imageData.data[pData + 1] = nextPixel.green();
-            imageData.data[pData + 2] = nextPixel.blue();
+        let px = particle.x,
+          py = particle.y;
+        particle.update(currentWidth, currentHeight);
+
+        // paint trail
+        if (particle.moveable) {
+          for (let w = 0; w < particle.size; w++) {
+            for (let h = 0; h < particle.size; h++) {
+              const pixelIndex = (~~(px + w) + ~~(py + h) * currentWidth) * 4;
+              const currentPixel = Color([
+                backgroundImageData.data[pixelIndex],
+                backgroundImageData.data[pixelIndex + 1],
+                backgroundImageData.data[pixelIndex + 2],
+              ]);
+              if (h < 1 && w < 1) {
+                const nextPixel = currentPixel.lighten(0.02);
+                starsImageData.data[pixelIndex] = nextPixel.red();
+                starsImageData.data[pixelIndex + 1] = nextPixel.green();
+                starsImageData.data[pixelIndex + 2] = nextPixel.blue();
+              } else {
+                starsImageData.data[pixelIndex] = currentPixel.red();
+                starsImageData.data[pixelIndex + 1] = currentPixel.green();
+                starsImageData.data[pixelIndex + 2] = currentPixel.blue();
+              }
+
+              starsImageData.data[pixelIndex + 3] =
+                backgroundImageData.data[pixelIndex + 3];
+            }
           }
         }
-        particle.update(currentWidth, currentHeight);
+
+        // determine pixel color
+        let isPink = false;
+        for (let w = 0; w < particle.size; w++) {
+          for (let h = 0; h < particle.size; h++) {
+            const pixelIndex =
+              (~~(particle.x + w) + ~~(particle.y + h) * currentWidth) * 4;
+            const currentPixel = Color([
+              backgroundImageData.data[pixelIndex],
+              backgroundImageData.data[pixelIndex + 1],
+              backgroundImageData.data[pixelIndex + 2],
+            ]);
+            isPink = currentPixel.hue() > 220 && currentPixel.hue() < 340;
+            if (isPink) {
+              break;
+            }
+          }
+          if (isPink) {
+            break;
+          }
+        }
+
+        // paint current star
+        // if it's pink, leave it colored, otherwise desaturate it
+        for (let w = 0; w < particle.size; w++) {
+          for (let h = 0; h < particle.size; h++) {
+            const pixelIndex =
+              (~~(particle.x + w) + ~~(particle.y + h) * currentWidth) * 4;
+            const currentPixel = Color([
+              backgroundImageData.data[pixelIndex],
+              backgroundImageData.data[pixelIndex + 1],
+              backgroundImageData.data[pixelIndex + 2],
+            ]);
+            const nextPixel = isPink
+              ? currentPixel.lighten(1.3)
+              : currentPixel.lighten(10);
+            starsImageData.data[pixelIndex] = nextPixel.red();
+            starsImageData.data[pixelIndex + 1] = nextPixel.green();
+            starsImageData.data[pixelIndex + 2] = nextPixel.blue();
+            starsImageData.data[pixelIndex + 3] =
+              255 - 255 * particle.brightness;
+          }
+        }
       }
 
-      context!.putImageData(imageData, 0, 0);
+      stars!.putImageData(starsImageData, 0, 0);
       if (loading) {
         setState((state) => ({ ...state, loading: false }));
       }
     }
   });
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      if (backgroundRef.current && width && height) {
+        const background = backgroundRef.current.getContext("2d", {
+          alpha: false,
+        });
+
+        // draw base gradient
+        let gradient = background!.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, "rgb(4,0,25)");
+        gradient.addColorStop(1, "rgb(1,42,123)");
+        background!.fillStyle = gradient;
+        background!.fillRect(0, 0, width, height);
+
+        // draw vertical slide gradient
+        background!.globalAlpha = 0.8;
+        gradient = background!.createLinearGradient(
+          Math.floor(width * 0.5 + 500),
+          -200,
+          Math.floor(width * 0.5 - 700),
+          0
+        );
+        gradient.addColorStop(0.5, "rgb(160,7,198)");
+        gradient.addColorStop(0.53, "rgb(160,7,198)");
+        gradient.addColorStop(0.47, "rgb(160,7,198)");
+        gradient.addColorStop(0.1, "rgba(155,1,157,0");
+        gradient.addColorStop(0.9, "rgba(155,1,157,0");
+        background!.fillStyle = gradient;
+        background!.fillRect(0, 0, width, height);
+
+        // draw radial bottom gradient
+        gradient = background!.createRadialGradient(
+          Math.floor(width / 2 + 30),
+          Math.floor(height * 0.8),
+          1,
+          Math.floor(width / 2 + 30),
+          height + 50,
+          Math.floor(height * 1.3)
+        );
+        gradient.addColorStop(0, "rgba(10,128,121,50)");
+        gradient.addColorStop(1, "rgba(10,128,121,0)");
+        background!.fillStyle = gradient;
+        background!.globalAlpha = 0.4;
+        background!.fillRect(0, 0, width, height);
+
+        setState((state) => ({
+          ...state,
+          backgroundImageData: background!.getImageData(0, 0, width, height),
+        }));
+      }
+    });
+  }, [didChange, backgroundRef, width, height]);
 
   return (
     <ClientOnly>
@@ -185,17 +265,30 @@ function Canvas({ pxPerStar = 9000 }: { pxPerStar?: number }) {
           position: "fixed",
           top: 0,
           left: 0,
+          opacity: 0,
+          transition: "opacity 0.2s",
+          ...(!loading && { opacity: 1 }),
         }}
       >
         <canvas
-          ref={canvasRef}
+          id="background-canvas"
+          ref={backgroundRef}
           width={String(width)}
           height={String(height)}
           style={{
             zIndex: 1,
-            transition: "opacity 0.2s",
-            opacity: 0,
-            ...(!loading && { opacity: 1 }),
+          }}
+        />
+        <canvas
+          id="stars-canvas"
+          ref={starsRef}
+          width={String(width)}
+          height={String(height)}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            zIndex: 2,
           }}
         />
         {/* <Image

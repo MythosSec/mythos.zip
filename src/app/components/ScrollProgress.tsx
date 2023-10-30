@@ -55,7 +55,9 @@ export default function ScrollProgress({
       >
         <Box
           width={size}
-          height={progressPct}
+          height="100%"
+          top={progressPct}
+          position="absolute"
           sx={{
             background: color,
             transform: "scaleY(-1)",

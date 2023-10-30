@@ -1,4 +1,7 @@
 export function documentHeight() {
+  if (typeof window === "undefined") {
+    return 0;
+  }
   return Math.max(
     document.body.scrollHeight,
     document.documentElement.scrollHeight,
