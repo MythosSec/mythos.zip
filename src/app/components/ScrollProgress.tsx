@@ -3,11 +3,12 @@ import { Box, BoxProps } from "@mui/joy";
 import useScrollPercentage from "../hooks/useScrollPercentage";
 import { useCallback } from "react";
 import { documentHeight } from "../util/dom";
+import Sheet from "./Sheet";
 
 export default function ScrollProgress({
   color = "#fff",
   orientation = "vertical",
-  size = 10,
+  size = 14,
   sx = {},
   ...props
 }: Omit<BoxProps, "width" | "height"> & {
@@ -53,6 +54,11 @@ export default function ScrollProgress({
         {...props}
         onMouseDown={onClick}
       >
+        <Sheet
+          variant="glass"
+          sx={{ height: "100%", width: size }}
+          background="light"
+        />
         <Box
           width={size}
           height="100%"
@@ -82,6 +88,11 @@ export default function ScrollProgress({
       {...props}
       onMouseDown={onClick}
     >
+      <Sheet
+        variant="glass"
+        sx={{ height: size, width: "100%" }}
+        background="light"
+      />
       <Box
         height={size}
         width={progressPct}
