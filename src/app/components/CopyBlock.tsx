@@ -1,20 +1,14 @@
 "use client";
 import { ComponentProps } from "react";
-import { IBM_Plex_Mono } from "next/font/google";
 import { CopyBlock as CopyBlockLib, atomOneLight } from "react-code-blocks";
 import { Box, Stack, Typography } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
 import Sheet from "./Sheet";
 
-const ibm = IBM_Plex_Mono({
-  subsets: ["latin"],
-  fallback: ["monospace"],
-  weight: "500",
-});
-
 function CopyBlock({
   theme = atomOneLight,
   children,
+  showLineNumbers = true,
   ...props
 }: Omit<ComponentProps<typeof CopyBlockLib>, "text"> & { children: string }) {
   return (
@@ -23,7 +17,10 @@ function CopyBlock({
         <Sheet variant="plain" sx={{ p: "0.25rem" }}>
           <Box py="2px">
             {children.split("\n").map((_, index) => (
-              <Typography className={ibm.className} key={index}>
+              <Typography
+                sx={{ fontFamiy: "var(--font-monospace)" }}
+                key={index}
+              >
                 &nbsp;
               </Typography>
             ))}
@@ -31,8 +28,26 @@ function CopyBlock({
         </Sheet>
       }
     >
-      <Stack className={ibm.className}>
-        <CopyBlockLib {...props} theme={theme} text={children} />
+      <Stack
+        sx={{
+          "& button": {
+            border: "2px solid transparent",
+            cursor: "pointer",
+          },
+          "& button svg": {
+            fill: "#131313",
+          },
+          "& button:hover": {
+            opacity: 1,
+          },
+        }}
+      >
+        <CopyBlockLib
+          {...props}
+          theme={theme}
+          text={children}
+          showLineNumbers={showLineNumbers}
+        />
       </Stack>
     </ClientOnly>
   );

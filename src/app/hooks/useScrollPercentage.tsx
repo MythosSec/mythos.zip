@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { documentHeight, scrollTop } from "../util/dom";
+import { scrollTop } from "../util/dom";
 import { debounce } from "../util/timing";
 
 export default function useScrollPercentage() {
   const [percent, setPercent] = useState(0);
   useEffect(() => {
     const callback = () => setPercent(scrollTop());
-    const [onScroll, cleanupOnScroll] = debounce(
-      () => window.requestAnimationFrame(callback),
-      5
-    );
+    const [onScroll, cleanupOnScroll] = debounce(callback, 1);
     document.addEventListener("scroll", onScroll);
     return () => {
       document.removeEventListener("scroll", onScroll);

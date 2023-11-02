@@ -65,12 +65,7 @@ export default function Header(props: StackProps) {
       <Stack>
         <List role="menubar" orientation="horizontal">
           <ListItem role="none">
-            <Link
-              href="/"
-              level="title-sm"
-              underline="none"
-              sx={{ color: "#fff" }}
-            >
+            <Link href="/" level="title-sm">
               <Home />
             </Link>
           </ListItem>
@@ -88,9 +83,7 @@ export default function Header(props: StackProps) {
               size="sm"
               sx={{ backgroundColor: "transparent !important", px: 0 }}
             >
-              <Typography level="title-md" sx={{ color: "#fff" }}>
-                Contact
-              </Typography>
+              <Typography level="title-md">Contact</Typography>
             </Button>
             <Popup
               role={undefined}
@@ -114,11 +107,9 @@ export default function Header(props: StackProps) {
                         href="https://twitter.com/mythossec"
                         underline="none"
                       >
-                        <TwitterIcon sx={{ color: "#fff" }} />
+                        <TwitterIcon color="inherit" />
                         &nbsp;
-                        <Typography textColor="common.white">
-                          Twitter
-                        </Typography>
+                        <Typography>Twitter</Typography>
                       </Link>
                     </StyledMenuItem>
                     <StyledMenuItem>
@@ -126,16 +117,14 @@ export default function Header(props: StackProps) {
                         href="https://youtube.com/@mythossec"
                         underline="none"
                       >
-                        <YouTubeIcon sx={{ color: "#fff" }} />
+                        <YouTubeIcon color="inherit" />
                         &nbsp;
-                        <Typography textColor="common.white">
-                          Youtube
-                        </Typography>
+                        <Typography>Youtube</Typography>
                       </Link>
                     </StyledMenuItem>
                     <StyledMenuItem>
                       <Link href="https://twitch.tv/mythossec" underline="none">
-                        <Typography textColor="common.white">Twitch</Typography>
+                        <Typography>Twitch</Typography>
                       </Link>
                     </StyledMenuItem>
                   </Sheet>

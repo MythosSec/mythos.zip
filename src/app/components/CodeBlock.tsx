@@ -1,15 +1,8 @@
 "use client";
 import { ComponentProps } from "react";
-import { IBM_Plex_Mono } from "next/font/google";
 import { CodeBlock as CodeBlockLib, atomOneLight } from "react-code-blocks";
 import { Stack } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
-
-const ibm = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: "500",
-  fallback: ["monospace"],
-});
 
 function CodeBlock({
   theme = atomOneLight,
@@ -18,7 +11,20 @@ function CodeBlock({
 }: Omit<ComponentProps<typeof CodeBlockLib>, "text"> & { children: string }) {
   return (
     <ClientOnly>
-      <Stack className={ibm.className}>
+      <Stack
+        sx={{
+          "& button": {
+            border: "2px solid transparent",
+            cursor: "pointer",
+          },
+          "& button svg": {
+            fill: "#131313",
+          },
+          "& button:hover": {
+            opacity: 1,
+          },
+        }}
+      >
         <CodeBlockLib {...props} theme={theme} text={children} />
       </Stack>
     </ClientOnly>

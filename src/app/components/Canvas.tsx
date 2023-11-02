@@ -5,9 +5,9 @@ import { randomBetween } from "../util/math";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { Box } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
-import { documentHeight } from "../util/dom";
 import useScrollPercentage from "../hooks/useScrollPercentage";
 import { useWindowSize } from "@uidotdev/usehooks";
+import useDocumentSize from "../hooks/useDocumentSize";
 
 // https://codepen.io/rlemon/pen/DdEjw
 
@@ -21,13 +21,25 @@ class Particle {
   vy = 0;
   vx = 0.1;
   brightness = 1;
-  trail = 10;
+  trail = 1;
+  trailSize = 20;
   moveable = true;
   drawn = false;
 
-  create(width: number, height: number) {
-    this.x = this.oX = Math.random() * width;
-    this.y = this.oY = Math.random() * height;
+  maxHeight = 0;
+  maxWidth = 0;
+
+  create(
+    width = this.maxWidth,
+    height = this.maxHeight,
+    minY = 0,
+    minX = 0,
+    moveable?: boolean
+  ) {
+    this.maxHeight = height;
+    this.maxWidth = width;
+    this.x = this.oX = Math.random() * (width - minX) + minX;
+    this.y = this.oY = Math.random() * (height - minY) + minY;
     this.depth = randomBetween(0.1, 10);
     this.size = (this.depth + 1) / 8;
 
@@ -44,11 +56,22 @@ class Particle {
       this.brightness = maxBrightness;
     }
 
+    const shortTrail = randomBetween(8, 12);
+    const longTrail = randomBetween(18, 22);
+    const trailP = randomBetween(0, 100);
+    // 90% of stars have a short trail, 10% long
+    if (trailP < 90) {
+      this.trailSize = shortTrail;
+    } else {
+      this.trailSize = longTrail;
+    }
+
     const slowVelocity = randomBetween(3, 4) / 10;
     const fastVelocity = randomBetween(7, 8) / 10;
     const ludicrousVelocity = randomBetween(18, 21) / 10;
-    // 90% of stars don't move, 10% do move
-    this.moveable = randomBetween(0, 100) > 90;
+    // 95% of stars don't move, 5% do move
+    this.moveable =
+      typeof moveable === "boolean" ? moveable : randomBetween(0, 100) > 95;
 
     // 80% of stars move slowly, 15% move fast, 5% move ludicrously fast
     const velocityP = randomBetween(0, 100);
@@ -70,171 +93,144 @@ class Particle {
     }
     if (this.y > height) {
       this.y = 1 - this.size;
-      this.x = this.oX;
     }
     if (this.x > width) {
       this.x = 1 - this.size;
-      this.y = this.oY;
     }
     this.y += this.vy;
     this.x += this.vx;
   }
+
+  get virtualX() {
+    return this.x % this.maxWidth;
+  }
+
+  get virtualY() {
+    return this.y % this.maxHeight;
+  }
 }
 
-function Canvas({ pxPerStar = 6000 }: { pxPerStar?: number }) {
-  const [
-    {
-      particles,
-      loading,
-      lastProgress,
-      lastWidth,
-      lastHeight,
-      lastDocHeight,
-      renderedHeight,
-      renderedWidth,
-    },
-    setState,
-  ] = useState<{
+function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
+  const [{ particles, loading, lastDocHeight }, setState] = useState<{
     particles: Particle[];
     loading: boolean;
-    lastProgress: number;
-    renderedHeight: number;
-    renderedWidth: number;
-    lastWidth: number;
-    lastHeight: number;
     lastDocHeight: number;
   }>({
     particles: [],
     loading: true,
-    lastProgress: 0,
-    renderedHeight: 0,
-    renderedWidth: 0,
-    lastWidth: 0,
-    lastHeight: 0,
     lastDocHeight: 0,
   });
-  const starsRef = useRef<HTMLCanvasElement>(null);
-  const offscreenStarsRef = useRef<HTMLCanvasElement>(null);
   const backgroundRef = useRef<HTMLCanvasElement>(null);
-  const offscreenBackgroundRef = useRef<HTMLCanvasElement>(null);
+  const starsRef = useRef<HTMLCanvasElement>(null);
   const { width, height } = useWindowSize();
   const [progress] = useScrollPercentage();
-  const docHeight = documentHeight();
-
-  useEffect(
-    () => setState((state) => ({ ...state, lastProgress: progress })),
-    [progress]
-  );
-  useEffect(
-    () => setState((state) => ({ ...state, lastDocHeight: docHeight })),
-    [docHeight]
-  );
-  useEffect(
-    () =>
-      setState((state) => ({
-        ...state,
-        lastWidth: width || 0,
-        lastHeight: height || 0,
-      })),
-    [width, height]
-  );
+  const { height: docHeight } = useDocumentSize();
 
   // spawn particles
   useEffect(() => {
-    if (width && docHeight && particles.length === 0) {
-      const nextParticles: Particle[] = [];
-      const count = Math.floor((width * docHeight) / pxPerStar);
-      let didSpawnShootingStar = false;
-      const shootingStar = randomBetween(1, 100) >= 90;
+    if (width && docHeight) {
+      const isLonger = docHeight > lastDocHeight;
+      const isShorter = docHeight < lastDocHeight;
 
-      for (let i = 0; i < count; i++) {
-        const particle = new Particle();
-        particle.create(width, docHeight);
-        nextParticles.push(particle);
+      if (!isLonger && !isShorter) {
+        return;
+      }
 
-        if (shootingStar && !didSpawnShootingStar) {
-          console.log("spawned shooting star");
-          particle.trail = 5;
-          particle.moveable = true;
-          didSpawnShootingStar = true;
+      const nextParticles: Particle[] = [...particles];
+      if (isLonger) {
+        const count = Math.floor(
+          (width * (docHeight - lastDocHeight)) / pxPerStar
+        );
+
+        for (let i = 0; i < count; i++) {
+          const particle = new Particle();
+          particle.create(width, docHeight, lastDocHeight);
+          nextParticles.push(particle);
+        }
+      } else if (isShorter) {
+        for (let i = 0; i < nextParticles.length; i++) {
+          const particle = nextParticles[i];
+          if (particle.y > docHeight) {
+            nextParticles.splice(i, 1);
+          }
         }
       }
-      setState((state) => ({ ...state, particles: nextParticles }));
+
+      setState((state) => ({
+        ...state,
+        particles: nextParticles,
+        lastDocHeight: docHeight,
+      }));
     }
-  }, [width, docHeight, particles.length, pxPerStar]);
+  }, [width, docHeight]);
 
   // render frame
   useAnimationFrame(() => {
-    if (
-      !offscreenBackgroundRef.current ||
-      !backgroundRef.current ||
-      !offscreenStarsRef.current ||
-      !offscreenBackgroundRef.current
-    ) {
+    if (!backgroundRef.current || !starsRef.current) {
       return;
     }
 
-    const { data, changed } = renderOffScreenBackground();
-    if (changed || progress !== lastProgress) {
-      renderOnScreenBackground();
-    }
-    renderStars(data);
+    const background = backgroundRef.current!.getContext("2d", {
+      willReadFrequently: true,
+    });
+    const stars = starsRef.current!.getContext("2d", {
+      willReadFrequently: true,
+    });
+
+    renderBackground(background!);
+    renderStars(background!, stars!);
 
     if (loading) {
       setState((state) => ({ ...state, loading: false }));
     }
   });
 
-  const renderStars = (data: ImageData) => {
-    console.time("stars");
+  const renderStars = (
+    background: CanvasRenderingContext2D,
+    stars: CanvasRenderingContext2D
+  ) => {
     const currentWidth = width || 0;
     const currentHeight = height || 0;
-    const offscreenStars = offscreenStarsRef.current!.getContext("2d");
-    const stars = starsRef.current!.getContext("2d");
-    const didRenderedSizeChange =
-      renderedHeight < docHeight || renderedWidth < (width || 0);
-    const didWindowSizeChange =
-      width !== lastWidth ||
-      height !== lastHeight ||
-      docHeight !== lastDocHeight;
-
-    if (didRenderedSizeChange || didWindowSizeChange) {
-      offscreenStars?.clearRect(0, 0, currentWidth, docHeight);
-    }
-
-    const starsImageData = offscreenStars!.getImageData(
+    const top = (docHeight - currentHeight) * (progress / 100);
+    // console.time("copy background data");
+    const backgroundData = background!.getImageData(
       0,
       0,
       currentWidth,
-      docHeight
+      currentHeight
     );
+    // console.timeEnd("copy background data");
+    stars.clearRect(0, 0, currentWidth, currentHeight);
+    const starsData = new ImageData(currentWidth, currentHeight);
 
+    // console.time("draw stars");
     for (let i = 0, l = particles.length; i < l; i++) {
       const particle = particles[i];
-      let px = particle.x,
-        py = particle.y;
       particle.update(currentWidth, docHeight);
+
+      if (
+        particle.y > currentHeight + top ||
+        particle.y + particle.size < top
+      ) {
+        continue;
+      }
 
       // paint trail
       if (particle.moveable) {
-        for (let w = 0; w < particle.size; w++) {
-          for (let h = 0; h < particle.size; h++) {
-            const pixelIndex = (~~(px + w) + ~~(py + h) * currentWidth) * 4;
-            const currentPixel = Color([
-              data.data[pixelIndex],
-              data.data[pixelIndex + 1],
-              data.data[pixelIndex + 2],
-            ]);
-            let nextPixel = currentPixel;
-            if (h < 1 && w < 1) {
-              nextPixel = currentPixel.lighten(particle.trail * 0.004);
-            }
-
-            starsImageData.data[pixelIndex] = nextPixel.red();
-            starsImageData.data[pixelIndex + 1] = nextPixel.green();
-            starsImageData.data[pixelIndex + 2] = nextPixel.blue();
-            starsImageData.data[pixelIndex + 3] = data.data[pixelIndex + 3];
-          }
+        for (let h = 0; h < particle.trailSize; h++) {
+          const dX = particle.x - particle.vx * h;
+          const dY = particle.y - particle.vy * h - top;
+          const pixelIndex = (~~dX + ~~dY * currentWidth) * 4;
+          const currentPixel = Color([
+            backgroundData.data[pixelIndex],
+            backgroundData.data[pixelIndex + 1],
+            backgroundData.data[pixelIndex + 2],
+          ]);
+          const nextPixel = currentPixel.lighten(particle.trail * 0.13);
+          starsData.data[pixelIndex] = nextPixel.red();
+          starsData.data[pixelIndex + 1] = nextPixel.green();
+          starsData.data[pixelIndex + 2] = nextPixel.blue();
+          starsData.data[pixelIndex + 3] = backgroundData.data[pixelIndex + 3];
         }
       }
 
@@ -243,11 +239,11 @@ function Canvas({ pxPerStar = 6000 }: { pxPerStar?: number }) {
       for (let w = 0; w < particle.size; w++) {
         for (let h = 0; h < particle.size; h++) {
           const pixelIndex =
-            (~~(particle.x + w) + ~~(particle.y + h) * currentWidth) * 4;
+            (~~(particle.x + w) + ~~(particle.y - top + h) * currentWidth) * 4;
           const currentPixel = Color([
-            data.data[pixelIndex],
-            data.data[pixelIndex + 1],
-            data.data[pixelIndex + 2],
+            backgroundData.data[pixelIndex],
+            backgroundData.data[pixelIndex + 1],
+            backgroundData.data[pixelIndex + 2],
           ]);
           isPink = currentPixel.hue() > 220 && currentPixel.hue() < 340;
           if (isPink) {
@@ -264,130 +260,78 @@ function Canvas({ pxPerStar = 6000 }: { pxPerStar?: number }) {
       for (let w = 0; w < particle.size; w++) {
         for (let h = 0; h < particle.size; h++) {
           const pixelIndex =
-            (~~(particle.x + w) + ~~(particle.y + h) * currentWidth) * 4;
+            (~~(particle.x + w) + ~~(particle.y - top + h) * currentWidth) * 4;
+
           const currentPixel = Color([
-            data.data[pixelIndex],
-            data.data[pixelIndex + 1],
-            data.data[pixelIndex + 2],
+            backgroundData.data[pixelIndex],
+            backgroundData.data[pixelIndex + 1],
+            backgroundData.data[pixelIndex + 2],
           ]);
           const nextPixel = isPink
-            ? currentPixel.lighten(1.3)
-            : currentPixel.lighten(10);
-          starsImageData.data[pixelIndex] = nextPixel.red();
-          starsImageData.data[pixelIndex + 1] = nextPixel.green();
-          starsImageData.data[pixelIndex + 2] = nextPixel.blue();
-          starsImageData.data[pixelIndex + 3] = 255 - 255 * particle.brightness;
+            ? currentPixel.lighten(1.2)
+            : currentPixel.lighten(7);
+          // starsData.data[pixelIndex] = 255;
+          // starsData.data[pixelIndex + 1] = 0;
+          // starsData.data[pixelIndex + 2] = 0;
+          starsData.data[pixelIndex] = nextPixel.red();
+          starsData.data[pixelIndex + 1] = nextPixel.green();
+          starsData.data[pixelIndex + 2] = nextPixel.blue();
+          starsData.data[pixelIndex + 3] = particle.brightness * 255;
         }
       }
     }
-
-    const top = (docHeight - currentHeight) * (progress / 100);
-    offscreenStars!.putImageData(starsImageData, 0, 0);
-    stars?.clearRect(0, 0, currentWidth, currentHeight);
-    stars?.drawImage(
-      offscreenStarsRef.current!,
-      0,
-      top,
-      currentWidth,
-      currentHeight,
-      0,
-      0,
-      currentWidth,
-      currentHeight
-    );
+    // console.timeEnd("draw stars");
+    // console.time("put star data");
+    stars!.putImageData(starsData, 0, 0);
+    // console.timeEnd("put star data");
   };
 
-  const renderOnScreenBackground = () => {
-    console.log("render onscreen background");
+  const renderBackground = (canvas: CanvasRenderingContext2D) => {
     const currentHeight = height || 0;
     const currentWidth = width || 0;
     const top = (docHeight - currentHeight) * (progress / 100);
-    const background = backgroundRef.current!.getContext("2d", {
-      alpha: false,
-    });
-    background?.drawImage(
-      offscreenBackgroundRef.current!,
-      0,
-      top,
-      currentWidth,
-      currentHeight,
-      0,
-      0,
-      currentWidth,
-      currentHeight
-    );
-  };
-
-  const renderOffScreenBackground = () => {
-    const currentHeight = height || 0;
-    const currentWidth = width || 0;
-    const background = offscreenBackgroundRef.current!.getContext("2d", {
-      alpha: false,
-    });
-
-    const didRenderedSizeChange =
-      renderedHeight <= docHeight || renderedWidth <= (width || 0);
-    const didWindowSizeChange =
-      width !== lastWidth ||
-      height !== lastHeight ||
-      docHeight !== lastDocHeight;
-
-    if (!didRenderedSizeChange || !didWindowSizeChange) {
-      return {
-        changed: false,
-        data: background!.getImageData(0, 0, currentWidth, docHeight),
-      };
-    }
-    console.log("render offscreen background");
+    canvas!.globalAlpha = 1;
+    canvas?.clearRect(0, 0, currentWidth, currentHeight);
 
     // draw base gradient
-    let gradient = background!.createLinearGradient(0, 0, 0, docHeight);
+    let gradient = canvas!.createLinearGradient(0, -top, 0, docHeight);
     gradient.addColorStop(0, "rgb(4,0,25)");
     gradient.addColorStop(1, "rgb(1,42,123)");
-    background!.fillStyle = gradient;
-    background!.fillRect(0, 0, currentWidth, docHeight);
+    canvas!.fillStyle = gradient;
+    canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
-    // draw vertical slide gradient
-    background!.globalAlpha = 0.8;
-    gradient = background!.createLinearGradient(
-      Math.floor(currentWidth * 0.5 + 500),
-      -200,
+    // // draw vertical slide gradient
+    canvas!.globalAlpha = 0.8;
+    gradient = canvas!.createLinearGradient(
+      Math.floor(currentWidth * 0.55 + 500),
+      -200 - top,
       Math.floor(currentWidth * 0.5 - 700),
-      0
+      -top
     );
     gradient.addColorStop(0.5, "rgb(160,7,198)");
     gradient.addColorStop(0.53, "rgb(160,7,198)");
     gradient.addColorStop(0.47, "rgb(160,7,198)");
     gradient.addColorStop(0.1, "rgba(155,1,157,0");
     gradient.addColorStop(0.9, "rgba(155,1,157,0");
-    background!.fillStyle = gradient;
-    background!.fillRect(0, 0, currentWidth, docHeight);
+    canvas!.fillStyle = gradient;
+    canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
     // draw radial bottom gradient
-    gradient = background!.createRadialGradient(
+    canvas!.globalAlpha = 0.35;
+    gradient = canvas!.createRadialGradient(
       Math.floor(currentWidth / 2 + 30),
-      Math.floor(docHeight * 0.8),
+      Math.floor(docHeight * 0.9) - top,
       0.1,
       Math.floor(currentWidth / 2 + 30),
-      currentHeight + currentHeight * 0.9,
-      Math.floor(docHeight * 0.9)
+      Math.floor(docHeight * 0.3) - top,
+      Math.floor(docHeight * 0.8)
     );
     gradient.addColorStop(0, "rgba(10,128,121,50)");
     gradient.addColorStop(1, "rgba(10,128,121,0)");
-    background!.fillStyle = gradient;
-    background!.globalAlpha = 0.4;
-    background!.fillRect(0, 0, currentWidth, docHeight);
+    canvas!.fillStyle = gradient;
+    canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
-    setState((state) => ({
-      ...state,
-      renderedHeight: docHeight,
-      renderedWidth: currentWidth,
-    }));
-
-    return {
-      changed: true,
-      data: background!.getImageData(0, 0, currentWidth, docHeight),
-    };
+    canvas!.globalAlpha = 1;
   };
 
   return (
@@ -404,7 +348,7 @@ function Canvas({ pxPerStar = 6000 }: { pxPerStar?: number }) {
         }}
       >
         <canvas
-          id="background-canvas"
+          id="background"
           ref={backgroundRef}
           width={String(width)}
           height={String(height)}
@@ -416,39 +360,16 @@ function Canvas({ pxPerStar = 6000 }: { pxPerStar?: number }) {
           }}
         />
         <canvas
-          id="stars-canvas"
+          id="stars"
           ref={starsRef}
           width={String(width)}
           height={String(height)}
           style={{
-            position: "fixed",
+            position: "absolute",
             top: 0,
             left: 0,
             zIndex: 2,
           }}
-        />
-
-        <canvas
-          style={{
-            position: "absolute",
-            left: 100000,
-            top: -100000,
-          }}
-          id="offscreen-background-canvas"
-          ref={offscreenBackgroundRef}
-          width={String(width)}
-          height={String(docHeight)}
-        />
-        <canvas
-          style={{
-            position: "absolute",
-            left: 100000,
-            top: -100000,
-          }}
-          id="offscreen-stars-canvas"
-          ref={offscreenStarsRef}
-          width={String(width)}
-          height={String(docHeight)}
         />
       </Box>
     </ClientOnly>

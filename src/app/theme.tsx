@@ -26,7 +26,8 @@ const theme = extendTheme({
           "900": "#4c1d95",
         },
         text: {
-          primary: "var(--joy-palette-primary-50)",
+          primary: "var(--joy-palette-common-white)",
+          secondary: "var(--joy-palette-common-white)",
         },
       },
     },
@@ -51,11 +52,21 @@ const theme = extendTheme({
   },
   fontFamily: {
     display: "var(--font-display)",
+    code: "var(--font-monospace)",
   },
   components: {
     JoyLink: {
       defaultProps: {
         component: LinkComponent,
+        underline: "none",
+        textColor: "text.primary",
+      },
+      styleOverrides: {
+        root: {
+          "&:visited": {
+            color: "inherit",
+          },
+        },
       },
     },
     JoyTypography: {

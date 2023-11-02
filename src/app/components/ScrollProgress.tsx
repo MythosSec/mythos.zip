@@ -1,9 +1,11 @@
 "use client";
 import { Box, BoxProps } from "@mui/joy";
 import useScrollPercentage from "../hooks/useScrollPercentage";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { documentHeight } from "../util/dom";
 import Sheet from "./Sheet";
+import { useWindowSize } from "@uidotdev/usehooks";
+import useDocumentSize from "../hooks/useDocumentSize";
 
 export default function ScrollProgress({
   color = "#fff",
@@ -15,7 +17,17 @@ export default function ScrollProgress({
   orientation?: "vertical" | "horizontal";
   size?: number;
 }) {
-  const [progress, remaining] = useScrollPercentage();
+  const [show, setShow] = useState(false);
+  const [progress] = useScrollPercentage();
+  const { height } = useWindowSize();
+  const { height: docHeight } = useDocumentSize();
+
+  useEffect(() => {
+    if (height && docHeight) {
+      setShow(docHeight > height);
+    }
+  }, [height, docHeight]);
+
   const progressPct = `${progress}%`;
   const onClick = useCallback((event: React.MouseEvent) => {
     if (event.button !== 0) {
@@ -38,6 +50,10 @@ export default function ScrollProgress({
     }
   }, []);
 
+  if (!show) {
+    return null;
+  }
+
   if (orientation === "vertical") {
     return (
       <Box
@@ -56,7 +72,7 @@ export default function ScrollProgress({
       >
         <Sheet
           variant="glass"
-          sx={{ height: "100%", width: size }}
+          sx={{ height: "100%", width: size, borderRadius: 0 }}
           background="light"
         />
         <Box
@@ -90,7 +106,7 @@ export default function ScrollProgress({
     >
       <Sheet
         variant="glass"
-        sx={{ height: size, width: "100%" }}
+        sx={{ height: size, width: "100%", borderRadius: 0 }}
         background="light"
       />
       <Box
