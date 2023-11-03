@@ -1,13 +1,5 @@
-"use client";
 import { extendTheme } from "@mui/joy";
-import Link, { LinkProps } from "next/link";
-import { forwardRef } from "react";
-
-const LinkComponent = forwardRef<HTMLAnchorElement, LinkProps>(
-  function LinkComponent(props, ref) {
-    return <Link ref={ref} {...props} />;
-  }
-);
+import Link from "./components/Link";
 
 const theme = extendTheme({
   colorSchemes: {
@@ -35,38 +27,32 @@ const theme = extendTheme({
   typography: {
     h1: {
       fontSize: "4rem",
-      letterSpacing: 1,
     },
     h2: {
       fontSize: "3.3rem",
-      letterSpacing: 1,
     },
     h3: {
       fontSize: "2.5rem",
-      letterSpacing: 1,
     },
     h4: {
       fontSize: "2rem",
-      letterSpacing: 1,
+    },
+    "body-sm": {
+      color: "var(--joy-palette-text-primary)",
     },
   },
   fontFamily: {
+    body: "var(--font-body)",
     display: "var(--font-display)",
+    display2: "var(--font-display2)",
     code: "var(--font-monospace)",
   },
   components: {
     JoyLink: {
       defaultProps: {
-        component: LinkComponent,
+        component: Link(),
         underline: "none",
         textColor: "text.primary",
-      },
-      styleOverrides: {
-        root: {
-          "&:visited": {
-            color: "inherit",
-          },
-        },
       },
     },
     JoyTypography: {

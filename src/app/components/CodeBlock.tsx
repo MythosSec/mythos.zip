@@ -13,6 +13,10 @@ function CodeBlock({
     <ClientOnly>
       <Stack
         sx={{
+          mx: 4,
+          "& > div": {
+            p: 2,
+          },
           "& button": {
             border: "2px solid transparent",
             cursor: "pointer",

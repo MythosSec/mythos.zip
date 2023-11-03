@@ -15,7 +15,6 @@ import PostContentEmbeddedEntry from "./PostContentEmbeddedEntry";
 const Tr = ({ children }: { children: ReactNode }) => <tr>{children}</tr>;
 const Td = ({ children }: { children: ReactNode }) => <td>{children}</td>;
 const Th = ({ children }: { children: ReactNode }) => <th>{children}</th>;
-const Fragment = ({ children }: { children: ReactNode }) => <>{children}</>;
 
 export default function PostContentNode({
   depth = 0,
@@ -40,6 +39,7 @@ export default function PostContentNode({
       childProps.level = "h4";
       break;
     case BLOCKS.PARAGRAPH:
+      childProps = { mb: 3 };
       break;
     case BLOCKS.QUOTE:
       Element = BlockQuote;
@@ -52,6 +52,7 @@ export default function PostContentNode({
       break;
     case BLOCKS.HR:
       Element = Divider;
+      childProps = { sx: { my: 4 } };
       break;
     case BLOCKS.TABLE_ROW:
       Element = Tr;

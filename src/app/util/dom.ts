@@ -14,7 +14,12 @@ export function documentWidth(target?: Element) {
   return Math.max(ttarget.scrollWidth, ttarget.clientWidth);
 }
 
+export function scrollPercent() {
+  const [scrollY, height] = scrollTop();
+  return scrollY / height;
+}
+
 export function scrollTop() {
   const totalDocScrollLength = documentHeight() - window.innerHeight;
-  return window.scrollY / totalDocScrollLength;
+  return [window.scrollY, totalDocScrollLength];
 }

@@ -8,9 +8,12 @@ import Sheet from "./Sheet";
 function CopyBlock({
   theme = atomOneLight,
   children,
-  showLineNumbers = true,
+  showLineNumbers = false,
   ...props
-}: Omit<ComponentProps<typeof CopyBlockLib>, "text"> & { children: string }) {
+}: Omit<ComponentProps<typeof CopyBlockLib>, "text"> & {
+  children: string;
+  showLineNumbers?: boolean;
+}) {
   return (
     <ClientOnly
       fallback={
@@ -30,6 +33,10 @@ function CopyBlock({
     >
       <Stack
         sx={{
+          mx: 4,
+          "& > div": {
+            p: 2,
+          },
           "& button": {
             border: "2px solid transparent",
             cursor: "pointer",

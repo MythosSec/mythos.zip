@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/joy";
 import Logo from "./Logo";
+import { SocialMediaSkeleton } from "../api/contentful";
 import { styled } from "@mui/joy/styles";
 import { Popper } from "@mui/base/Popper";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
@@ -26,7 +27,10 @@ const Popup = styled(Popper)({
   zIndex: 1000,
 });
 
-export default function Header(props: StackProps) {
+export default function Header({
+  socials,
+  ...props
+}: StackProps & { socials: SocialMediaSkeleton["fields"] }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const onClose = useCallback(() => setOpen(false), []);
@@ -60,7 +64,12 @@ export default function Header(props: StackProps) {
   }
 
   return (
-    <Stack flexDirection="row" justifyContent="space-between" {...props}>
+    <Stack
+      flexDirection="row"
+      justifyContent="space-between"
+      {...props}
+      component="header"
+    >
       <Logo size={60} />
       <Stack>
         <List role="menubar" orientation="horizontal">
@@ -102,31 +111,22 @@ export default function Header(props: StackProps) {
                   }}
                 >
                   <Sheet variant="glass" sx={{ p: 2 }}>
-                    <StyledMenuItem>
-                      <Link
-                        href="https://twitter.com/mythossec"
-                        underline="none"
-                      >
-                        <TwitterIcon color="inherit" />
-                        &nbsp;
-                        <Typography>Twitter</Typography>
-                      </Link>
-                    </StyledMenuItem>
-                    <StyledMenuItem>
-                      <Link
-                        href="https://youtube.com/@mythossec"
-                        underline="none"
-                      >
-                        <YouTubeIcon color="inherit" />
-                        &nbsp;
-                        <Typography>Youtube</Typography>
-                      </Link>
-                    </StyledMenuItem>
-                    <StyledMenuItem>
-                      <Link href="https://twitch.tv/mythossec" underline="none">
-                        <Typography>Twitch</Typography>
-                      </Link>
-                    </StyledMenuItem>
+                    {socials.fields
+                      .filter(({ fields: { enabled } }) => enabled)
+                      .map(({ fields: { name, link } }) => (
+                        <StyledMenuItem>
+                          <Link href={link}>
+                            {name === "Twitter" && (
+                              <TwitterIcon color="inherit" />
+                            )}
+                            {name === "Youtube" && (
+                              <YouTubeIcon color="inherit" />
+                            )}
+                            &nbsp;
+                            <Typography>{name}</Typography>
+                          </Link>
+                        </StyledMenuItem>
+                      ))}
                   </Sheet>
                 </MenuList>
               </ClickAwayListener>

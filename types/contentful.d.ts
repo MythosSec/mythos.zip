@@ -332,7 +332,97 @@ export interface IComponentSeoTwitter
   };
 }
 
+export interface IComponentSeriesFields {
+  /** Internal Name */
+  internalName: string;
+
+  /** Name */
+  name: string;
+}
+
+/** To logically group posts by series. */
+
+export interface IComponentSeries extends Entry<IComponentSeriesFields> {
+  sys: {
+    id: string;
+    type: string;
+    createdAt: string;
+    updatedAt: string;
+    locale: string;
+    contentType: {
+      sys: {
+        id: "componentSeries";
+        linkType: "ContentType";
+        type: "Link";
+      };
+    };
+  };
+}
+
+export interface IComponentSocialMediaBlockFields {
+  /** Internal Name */
+  internalName: string;
+
+  /** Name */
+  name: string;
+
+  /** Fields */
+  fields: IComponentSocials[];
+}
+
+export interface IComponentSocialMediaBlock
+  extends Entry<IComponentSocialMediaBlockFields> {
+  sys: {
+    id: string;
+    type: string;
+    createdAt: string;
+    updatedAt: string;
+    locale: string;
+    contentType: {
+      sys: {
+        id: "componentSocialMediaBlock";
+        linkType: "ContentType";
+        type: "Link";
+      };
+    };
+  };
+}
+
+export interface IComponentSocialsFields {
+  /** Internal Name */
+  internalName: string;
+
+  /** Name */
+  name: string;
+
+  /** Enabled */
+  enabled: boolean;
+
+  /** Link */
+  link: string;
+}
+
+export interface IComponentSocials extends Entry<IComponentSocialsFields> {
+  sys: {
+    id: string;
+    type: string;
+    createdAt: string;
+    updatedAt: string;
+    locale: string;
+    contentType: {
+      sys: {
+        id: "componentSocials";
+        linkType: "ContentType";
+        type: "Link";
+      };
+    };
+  };
+}
+
 export interface IComponentTagFields {
+  /** Internal Name */
+  internalName: string;
+
   /** Name */
   name: string;
 
@@ -372,29 +462,29 @@ export interface IPageBlogPostFields {
   /** Subtitle */
   shortDescription?: string | undefined;
 
+  /** Author */
+  author: IComponentAuthor;
+
+  /** Show Table of Contents */
+  showTableOfContents: boolean;
+
+  /** Series */
+  series?: IComponentSeries | undefined;
+
+  /** Tags */
+  tags?: IComponentTag[] | undefined;
+
   /** Published date */
   publishedDate: string;
 
-  /** Read Length */
-  readLength: number;
-
   /** Content */
   content: Document;
-
-  /** Author */
-  author: IComponentAuthor;
 
   /** Featured image */
   featuredImage: Asset;
 
   /** Show Featured Image */
   showFeaturedImage: boolean;
-
-  /** Related blog posts */
-  relatedBlogPosts?: IPageBlogPost[] | undefined;
-
-  /** Tags */
-  tags?: IComponentTag[] | undefined;
 
   /** SEO fields */
   seoFields: IComponentSeo;
@@ -458,6 +548,9 @@ export type CONTENT_TYPE =
   | "componentSeoOpenGraph"
   | "componentSeoRobots"
   | "componentSeoTwitter"
+  | "componentSeries"
+  | "componentSocialMediaBlock"
+  | "componentSocials"
   | "componentTag"
   | "pageBlogPost"
   | "pageLanding";
@@ -471,6 +564,9 @@ export type IEntry =
   | IComponentSeoOpenGraph
   | IComponentSeoRobots
   | IComponentSeoTwitter
+  | IComponentSeries
+  | IComponentSocialMediaBlock
+  | IComponentSocials
   | IComponentTag
   | IPageBlogPost
   | IPageLanding;

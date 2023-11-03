@@ -3,7 +3,7 @@ import { Sheet as JoySheet, SheetProps } from "@mui/joy";
 export default function Sheet({
   sx = {},
   variant = "glass",
-  blur = 1,
+  blur = 1.5,
   background = "light",
   ...props
 }: Omit<SheetProps, "variant"> & {
@@ -18,7 +18,7 @@ export default function Sheet({
           background:
             background === "dark"
               ? "rgba(0, 0, 0, 0.05)"
-              : "rgba(255,255,255, 0.03)",
+              : "rgba(255,255,255, 0.02)",
           borderRadius: 8,
           boxShadow: "0 4px 30px rgba(0,0,0, 0.01)",
           backdropFilter: `blur(${blur}px)`,

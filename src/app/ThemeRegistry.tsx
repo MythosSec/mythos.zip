@@ -76,6 +76,9 @@ export default function ThemeRegistry(props: { options: any; children: any }) {
               "&::-webkit-scrollbar, & *::-webkit-scrollbar": {
                 width: 0,
               },
+              code: {
+                fontFamily: "var(--font-monospace)",
+              },
             },
           }}
         />

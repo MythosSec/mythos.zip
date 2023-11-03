@@ -1,4 +1,5 @@
-import { useMemo, useCallback } from "react";
+"use client";
+import { useMemo, useCallback, useContext } from "react";
 import {
   Block,
   Document,
@@ -8,55 +9,51 @@ import {
 } from "@contentful/rich-text-types";
 import { encodeClassName } from "@/app/util/string";
 import { Link, Stack, StackProps, Typography } from "@mui/joy";
+import clsx from "clsx";
+import PostContext from "./usePostContext";
+import { findSectionHeadings } from "@/app/util/contentful";
 
-interface HeadingItem {
-  title: string;
-  className: string;
-}
+const minItemOpacity = 0.25;
+const proximityCount = 6;
 
 export default function TableOfContents({
   document,
   ...props
 }: StackProps & { document: Document }) {
-  console.log("toc");
-  const findHeadings = useCallback(
-    (node: Block | Text | Inline, headings: HeadingItem[] = []) => {
-      console.log(node.nodeType);
-      if (node.nodeType === BLOCKS.EMBEDDED_ENTRY) {
-        const type = node.data.target.sys.contentType.sys.id;
-        if (type === "componentSectionHeader") {
-          const title = node.data.target.fields.title;
-          headings.push({
-            title,
-            className: encodeClassName(title),
-          });
-        }
-      }
-      if ("content" in node) {
-        node.content.forEach((props) => findHeadings(props, headings));
-      }
-
-      return headings;
-    },
-    []
-  );
-
-  const headings = useMemo(() => {
-    const result = findHeadings(document);
-    console.log(result);
-    return result;
-  }, [document]);
+  const { selected } = useContext(PostContext);
+  const headings = useMemo(() => findSectionHeadings(document), [document]);
 
   return (
     <Stack {...props}>
-      <Typography mb={4} level="title-lg">
-        Content
+      <Typography mb={3} level="title-lg">
+        Contents
       </Typography>
-      {headings.map(({ title, className }) => (
-        <Link key={className} href={`#${className}`}>
-          {title}
-        </Link>
-      ))}
+      {headings.map(({ title, className }, index) => {
+        const isSelected = (!selected && index === 0) || selected === index;
+        const proximity = Math.min(
+          index > selected ? index - selected : selected - index,
+          proximityCount
+        );
+        const unselectedOpacity = Math.max(
+          ((1 - minItemOpacity) / proximityCount) *
+            (proximityCount - proximity),
+          minItemOpacity
+        );
+        return (
+          <Link
+            key={className}
+            href={`#${className}`}
+            className={clsx({ selected: isSelected })}
+            fontWeight={isSelected ? "bold" : "normal"}
+            sx={{
+              opacity: isSelected ? 1 : unselectedOpacity,
+              transition: "0.1s opacity",
+            }}
+          >
+            {title}
+          </Link>
+        );
+      })}
     </Stack>
   );
 }

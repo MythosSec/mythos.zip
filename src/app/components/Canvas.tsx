@@ -226,7 +226,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
             backgroundData.data[pixelIndex + 1],
             backgroundData.data[pixelIndex + 2],
           ]);
-          const nextPixel = currentPixel.lighten(particle.trail * 0.13);
+          const nextPixel = currentPixel.lighten(particle.trail * 0.7);
           starsData.data[pixelIndex] = nextPixel.red();
           starsData.data[pixelIndex + 1] = nextPixel.green();
           starsData.data[pixelIndex + 2] = nextPixel.blue();
@@ -309,10 +309,10 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
       -top
     );
     gradient.addColorStop(0.5, "rgb(160,7,198)");
-    gradient.addColorStop(0.53, "rgb(160,7,198)");
-    gradient.addColorStop(0.47, "rgb(160,7,198)");
-    gradient.addColorStop(0.1, "rgba(155,1,157,0");
-    gradient.addColorStop(0.9, "rgba(155,1,157,0");
+    // gradient.addColorStop(0.53, "rgb(160,7,198)");
+    // gradient.addColorStop(0.47, "rgb(160,7,198)");
+    gradient.addColorStop(0, "rgba(155,1,157,0");
+    gradient.addColorStop(1, "rgba(155,1,157,0");
     canvas!.fillStyle = gradient;
     canvas!.fillRect(0, 0, currentWidth, currentHeight);
 

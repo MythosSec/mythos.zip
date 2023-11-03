@@ -2,6 +2,7 @@ import { createClient } from "contentful";
 import {
   IPageBlogPostFields,
   IComponentSeoFields,
+  IComponentSocialMediaBlockFields,
 } from "../../../types/contentful";
 import { Metadata } from "next";
 
@@ -16,10 +17,24 @@ export interface BlogPostSkeleton {
   fields: IPageBlogPostFields;
 }
 
+export interface SocialMediaSkeleton {
+  contentTypeId: "componentSocialMediaBlock";
+  fields: IComponentSocialMediaBlockFields;
+}
+
 export const getBlogPosts = () =>
   client.getEntries<BlogPostSkeleton>({
     content_type: "pageBlogPost",
   });
+
+export const getSocials = async () => {
+  const response = await client.getEntries<SocialMediaSkeleton>({
+    content_type: "componentSocialMediaBlock",
+    "fields.internalName[match]": "social media block - default",
+  });
+  const [socials] = response.items;
+  return socials;
+};
 
 export const getBlogPost = (entryId: string) =>
   client.getEntry<BlogPostSkeleton>(entryId);
@@ -60,27 +75,27 @@ export const parseMetadata = ({
     telephone: false,
   },
   robots: {
-    index: robots.fields.index,
-    follow: robots.fields.follow,
-    nocache: !robots.fields.cache,
+    index: (robots.fields as any).index,
+    follow: (robots.fields as any).follow,
+    nocache: !(robots.fields as any).cache,
     googleBot: {
-      index: robots.fields.index,
-      follow: robots.fields.follow,
-      "max-image-preview": robots.fields.maxImagePreview,
+      index: (robots.fields as any).index,
+      follow: (robots.fields as any).follow,
+      "max-image-preview": (robots.fields as any).maxImagePreview,
     },
   },
   twitter: {
-    title: twitter.fields.title,
-    description: twitter.fields.description,
-    siteId: twitter.fields.siteId,
-    creator: twitter.fields.creator,
-    creatorId: twitter.fields.creatorId,
-    card: twitter.fields.card,
+    title: (twitter.fields as any).title,
+    description: (twitter.fields as any).description,
+    siteId: (twitter.fields as any).siteId,
+    creator: (twitter.fields as any).creator,
+    creatorId: (twitter.fields as any).creatorId,
+    card: (twitter.fields as any).card,
   },
   openGraph: {
-    title: openGraph.fields.title,
-    description: openGraph.fields.description,
-    siteName: openGraph.fields.siteName,
+    title: (openGraph.fields as any).title,
+    description: (openGraph.fields as any).description,
+    siteName: (openGraph.fields as any).siteName,
     locale,
     type: "website",
   },

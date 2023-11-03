@@ -1,3 +1,4 @@
+import { Stack } from "@mui/joy";
 import { ICodeFields } from "../../../../../types/contentful";
 import CodeBlock from "../../CodeBlock";
 import CopyBlock from "../../CopyBlock";
@@ -10,14 +11,16 @@ export default function PostEntryCodeBlock({
 }: ICodeFields) {
   if (showCopyButton) {
     return (
-      <CopyBlock {...props} wrapLongLines={wordWrap}>
-        {text}
-      </CopyBlock>
+      <Stack my={4}>
+        <CopyBlock {...props}>{text}</CopyBlock>
+      </Stack>
     );
   }
   return (
-    <CodeBlock {...props} wrapLongLines={wordWrap}>
-      {text}
-    </CodeBlock>
+    <Stack my={4}>
+      <CodeBlock {...props} wrapLongLines={wordWrap}>
+        {text}
+      </CodeBlock>
+    </Stack>
   );
 }

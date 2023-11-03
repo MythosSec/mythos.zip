@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import localFont from "next/font/local";
+import { Catamaran, Inconsolata } from "next/font/google";
 import ThemeRegistry from "./ThemeRegistry";
 import Canvas from "./components/Canvas";
 import { Stack } from "@mui/joy";
 import Header from "./components/Header";
 import clsx from "clsx";
+import Footer from "./components/Footer";
+import { getSocials } from "./api/contentful";
 
-const body = Inter({ variable: "--font-body", subsets: ["latin"] });
-const display = localFont({
-  src: "../../public/Bagotalos.woff2",
-  display: "swap",
-  variable: "--font-display",
+const body = Catamaran({ variable: "--font-body", subsets: ["latin"] });
+const display = body;
+const monospace = Inconsolata({
+  variable: "--font-monospace",
+  subsets: ["latin"],
+  weight: "600",
 });
 
 export const metadata: Metadata = {
@@ -54,14 +56,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const socials = await getSocials();
   return (
     <html lang="en">
-      <body className={clsx(body.className, display.variable)}>
+      <body
+        className={clsx(body.variable, display.variable, monospace.variable)}
+      >
         <ThemeRegistry options={{ key: "joy" }}>
           <Stack
             position="relative"
@@ -78,8 +83,9 @@ export default function RootLayout({
               mx={2}
               my={4}
             >
-              <Header mb={4} />
+              <Header mb={12} socials={socials.fields} />
               <main>{children}</main>
+              <Footer mt={30} />
             </Stack>
           </Stack>
         </ThemeRegistry>

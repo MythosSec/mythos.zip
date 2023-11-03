@@ -1,6 +1,6 @@
-import Image from "next/image";
 import profile from "../../../public/profile.png";
 import logoText from "../../../public/text.svg";
+import Image from "./Image";
 import { Box, Stack } from "@mui/joy";
 
 function Logo({ size = 100, text = true }: { size?: number; text?: boolean }) {
@@ -17,7 +17,7 @@ function Logo({ size = 100, text = true }: { size?: number; text?: boolean }) {
           border: "3px solid white",
         }}
       >
-        <Image src={profile} alt="logo" sizes="100vw" fill quality={100} />
+        <Image src={profile} alt="logo" sizes="100vw" fill />
       </Box>
       {text && (
         <Image
