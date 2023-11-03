@@ -22,6 +22,7 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Sheet from "./Sheet";
 import { useCallback, useState, useRef } from "react";
+import { homeRoute } from "../routes";
 
 const Popup = styled(Popper)({
   zIndex: 1000,
@@ -74,7 +75,7 @@ export default function Header({
       <Stack>
         <List role="menubar" orientation="horizontal">
           <ListItem role="none">
-            <Link href="/" level="title-sm">
+            <Link href={homeRoute()} level="title-sm">
               <Home />
             </Link>
           </ListItem>
@@ -114,8 +115,12 @@ export default function Header({
                     {socials.fields
                       .filter(({ fields: { enabled } }) => enabled)
                       .map(({ fields: { name, link } }) => (
-                        <StyledMenuItem>
-                          <Link href={link}>
+                        <StyledMenuItem key={name}>
+                          <Link
+                            href={link}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
                             {name === "Twitter" && (
                               <TwitterIcon color="inherit" />
                             )}

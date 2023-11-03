@@ -5,6 +5,7 @@ import {
   IComponentSocialMediaBlockFields,
 } from "../../../types/contentful";
 import { Metadata } from "next";
+import { formatISO } from "date-fns";
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -43,10 +44,34 @@ export const getBlogPostBySlug = async (slug: string) => {
   const response = await client.getEntries<BlogPostSkeleton>({
     content_type: "pageBlogPost",
     "fields.slug[match]": slug,
+    "fields.publishedDate[lt]": formatISO(new Date()),
     include: 10,
   });
   const [item] = response.items.filter((item) => item.fields.slug === slug);
+
   return item;
+};
+
+// 2013-01-01T00:00:00Z
+export const getSurroundingBlogPosts = async (publishedDate: string) => {
+  const [nextResponse, previousResponse] = await Promise.all([
+    client.getEntries<BlogPostSkeleton>({
+      content_type: "pageBlogPost",
+      "fields.publishedDate[gt]": publishedDate,
+      "fields.publishedDate[lt]": formatISO(new Date()),
+      select: "fields.slug,fields.title",
+      limit: 1,
+    }),
+    client.getEntries<BlogPostSkeleton>({
+      content_type: "pageBlogPost",
+      "fields.publishedDate[lt]": publishedDate,
+      select: "fields.slug,fields.title",
+      limit: 1,
+    }),
+  ]);
+  const [next] = nextResponse.items;
+  const [previous] = previousResponse.items;
+  return { next, previous };
 };
 
 export const parseMetadata = ({

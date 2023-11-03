@@ -8,7 +8,13 @@ export default function LinkList({
   return links
     .map(({ name, url }, index) => (
       <>
-        <Link key={`${name}${1}`} href={url} level="h4">
+        <Link
+          key={`${name}${1}`}
+          href={url}
+          level="h4"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
           {name}
         </Link>
         {index !== links.length - 1 && (

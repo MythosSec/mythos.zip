@@ -2,6 +2,7 @@ import { BlogPostSkeleton } from "@/app/api/contentful";
 import { encodeClassName } from "@/app/util/string";
 import { Stack, StackProps, Typography } from "@mui/joy";
 import LinkList from "./LinkList";
+import { tagRoute } from "@/app/routes";
 
 const gutterWidth = 180;
 
@@ -28,7 +29,7 @@ export default function PostTags({
             .filter(({ fields: { internalOnly } }) => !internalOnly)
             .map(({ fields: { name } }) => ({
               name,
-              url: `/tag/${encodeClassName(name)}`,
+              url: tagRoute(name),
             }))}
         />
       </Stack>

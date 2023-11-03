@@ -8,6 +8,10 @@ import clsx from "clsx";
 import Footer from "./components/Footer";
 import { getSocials } from "./api/contentful";
 
+// inspiration
+// https://www.awwwards.com/inspiration/blog-blog-blog-mohamed-essam-portfolio
+// https://www.thepoorcoder.com/how-to-make-nextjs-image-component-responsive/
+
 const body = Catamaran({ variable: "--font-body", subsets: ["latin"] });
 const display = body;
 const monospace = Inconsolata({

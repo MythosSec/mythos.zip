@@ -5,6 +5,7 @@ import {
 } from "../../../../types/contentful";
 import { parsePostDate } from "@/app/util/date";
 import { encodeClassName } from "@/app/util/string";
+import { authorRoute, seriesRoute } from "@/app/routes";
 
 export default function PostHeader({
   title,
@@ -26,10 +27,7 @@ export default function PostHeader({
     <Stack {...props}>
       <Stack mb={0.2}>
         <Typography>
-          <Link
-            fontWeight="bold"
-            href={`/author/${encodeClassName(author.fields.name)}`}
-          >
+          <Link fontWeight="bold" href={authorRoute(author.fields.name)}>
             {author.fields.name}
           </Link>
           <Typography textColor="text.tertiary">&nbsp;—&nbsp;</Typography>
@@ -58,10 +56,7 @@ export default function PostHeader({
       <Stack mt={3}>
         {series && (
           <Typography>
-            <Link
-              fontWeight="bold"
-              href={`/series/${encodeClassName(series.fields.name)}`}
-            >
+            <Link fontWeight="bold" href={seriesRoute(series.fields.name)}>
               {series.fields.name}
             </Link>
             &nbsp;series

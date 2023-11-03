@@ -226,7 +226,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
             backgroundData.data[pixelIndex + 1],
             backgroundData.data[pixelIndex + 2],
           ]);
-          const nextPixel = currentPixel.lighten(particle.trail * 0.7);
+          const nextPixel = currentPixel.lighten(particle.trail * 0.3);
           starsData.data[pixelIndex] = nextPixel.red();
           starsData.data[pixelIndex + 1] = nextPixel.green();
           starsData.data[pixelIndex + 2] = nextPixel.blue();

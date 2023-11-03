@@ -2,6 +2,7 @@ import {
   getBlogPostBySlug,
   getSocials,
   parseMetadata,
+  getSurroundingBlogPosts,
 } from "@/app/api/contentful";
 import Post from "@/app/components/post/Post";
 import { calculateReadLength } from "@/app/util/contentful";
@@ -13,10 +14,19 @@ export default async function BlogPost({
   params: { id: string };
 }) {
   const post = await getBlogPostBySlug(id);
+  const { next, previous } = await getSurroundingBlogPosts(
+    post.fields.publishedDate
+  );
   const socials = await getSocials();
   const readLength = Math.floor(calculateReadLength(post.fields.content));
   return (
-    <Post post={post.fields} socials={socials.fields} readLength={readLength} />
+    <Post
+      post={post.fields}
+      socials={socials?.fields}
+      readLength={readLength}
+      next={next?.fields}
+      previous={previous?.fields}
+    />
   );
 }
 

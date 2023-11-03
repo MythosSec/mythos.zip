@@ -11,22 +11,35 @@ import {
 } from "react";
 
 interface PostContextState {
-  refs: Map<string, RefObject<HTMLParagraphElement>>; // refs to SectionHeader h tags
-  selected: number; // tracks which heading we're currently on based on scroll depth
+  sectionHeaderRefs: Map<string, RefObject<HTMLParagraphElement>>; // refs to SectionHeader h tags
+  selectedSectionHeader: number; // tracks which heading we're currently on based on scroll depth
+  postContentWrapperRef: RefObject<HTMLDivElement> | undefined; // a ref to the post content wrapper, used to limit the y position of the table of contents
+  tableOfContentsLocked: boolean; // if true, table of contents will be rendered in document flow at the bottom of the post
+  tableOfContentsY: number; // if tableOfContentsLocked is true, set table of contents to this y value
+  tableOfContentsRef: RefObject<HTMLDivElement> | undefined;
 }
 interface PostContextDispatch {
-  addRef: ((key: string, ref: RefObject<HTMLParagraphElement>) => void) | null;
-  clearRefs: (() => void) | null;
+  addSectionHeaderRef:
+    | ((key: string, ref: RefObject<HTMLParagraphElement>) => void)
+    | null;
+  clearSectionHeaderRefs: (() => void) | null;
+  setPostContentWrapperRef: ((ref: RefObject<HTMLDivElement>) => void) | null;
+  setTableOfContentsRef: ((ref: RefObject<HTMLDivElement>) => void) | null;
 }
 
 const defaultPostContextState = {
-  refs: new Map(),
-  selected: 0,
-  readTime: 0,
+  sectionHeaderRefs: new Map(),
+  selectedSectionHeader: 0,
+  postContentWrapperRef: undefined,
+  tableOfContentsRef: undefined,
+  tableOfContentsLocked: false,
+  tableOfContentsY: 0,
 };
 const defaultPostContextDispatch = {
-  addRef: null,
-  clearRefs: null,
+  addSectionHeaderRef: null,
+  clearSectionHeaderRefs: null,
+  setPostContentWrapperRef: null,
+  setTableOfContentsRef: null,
 };
 
 const PostContext = createContext<PostContextState & PostContextDispatch>({
@@ -39,24 +52,47 @@ export function PostContextProvider({
 }: {
   children: ReactNode | ReactNode[];
 }) {
-  const [{ refs, selected }, setState] = useState<PostContextState>(
-    defaultPostContextState
-  );
+  const [
+    {
+      sectionHeaderRefs,
+      selectedSectionHeader,
+      postContentWrapperRef,
+      tableOfContentsY,
+      tableOfContentsLocked,
+      tableOfContentsRef,
+    },
+    setState,
+  ] = useState<PostContextState>(defaultPostContextState);
   const [scrollTop, height] = useScrollTop();
   const { height: windowHeight } = useWindowSize();
 
-  const addRef = useCallback(
+  const addSectionHeaderRef = useCallback(
     (key: string, ref: RefObject<HTMLParagraphElement>) => {
-      if (!refs.has(key)) {
-        refs.set(key, ref);
-        setState((state) => ({ ...state, refs: new Map(refs.set(key, ref)) }));
+      if (!sectionHeaderRefs.has(key)) {
+        sectionHeaderRefs.set(key, ref);
+        setState((state) => ({
+          ...state,
+          sectionHeaderRefs: new Map(sectionHeaderRefs.set(key, ref)),
+        }));
       }
     },
-    [refs]
+    [sectionHeaderRefs]
   );
 
-  const clearRefs = useCallback(
-    () => setState((state) => ({ ...state, refs: new Map() })),
+  const clearSectionHeaderRefs = useCallback(
+    () => setState((state) => ({ ...state, sectionHeaderRefs: new Map() })),
+    []
+  );
+
+  const setPostContentWrapperRef = useCallback(
+    (ref: RefObject<HTMLDivElement>) =>
+      setState((state) => ({ ...state, postContentWrapperRef: ref })),
+    []
+  );
+
+  const setTableOfContentsRef = useCallback(
+    (ref: RefObject<HTMLDivElement>) =>
+      setState((state) => ({ ...state, tableOfContentsRef: ref })),
     []
   );
 
@@ -64,10 +100,11 @@ export function PostContextProvider({
     if (windowHeight === null) {
       return;
     }
+    // calculate current section header highlight
     let positions: [string, number][] = [];
-    let selected = 0;
-    const threshold = scrollTop + windowHeight * 0.66;
-    refs.forEach((ref, key) => {
+    let selectedSectionHeader = 0;
+    const threshold = scrollTop + windowHeight * 0.7;
+    sectionHeaderRefs.forEach((ref, key) => {
       if (ref.current) {
         positions.push([
           key,
@@ -77,16 +114,58 @@ export function PostContextProvider({
     });
     positions
       .sort((a, b) => a[1] - b[1])
-      .forEach(([key, refTop], index) => {
+      .forEach(([_, refTop], index) => {
         if (index === 0 || refTop < threshold) {
-          selected = index;
+          selectedSectionHeader = index;
         }
       });
-    setState((state) => ({ ...state, selected }));
-  }, [scrollTop, height, refs, windowHeight]);
+
+    // calculate table of contents lock state
+    let nextTableOfContentsY = tableOfContentsY;
+    let nextTableOfContentsLocked = false;
+    if (postContentWrapperRef?.current && tableOfContentsRef?.current) {
+      const wrapper = postContentWrapperRef.current;
+      const toc = tableOfContentsRef.current;
+      const wrapperEndY =
+        wrapper.getBoundingClientRect().top +
+        wrapper.offsetHeight +
+        scrollTop -
+        windowHeight +
+        toc.offsetHeight;
+      nextTableOfContentsY = wrapperEndY;
+      nextTableOfContentsLocked = scrollTop > wrapperEndY - 100;
+    }
+
+    setState((state) => ({
+      ...state,
+      selectedSectionHeader,
+      tableOfContentsY: nextTableOfContentsY,
+      tableOfContentsLocked: nextTableOfContentsLocked,
+    }));
+  }, [
+    scrollTop,
+    height,
+    sectionHeaderRefs,
+    windowHeight,
+    postContentWrapperRef,
+    tableOfContentsRef,
+  ]);
 
   return (
-    <PostContext.Provider value={{ refs, selected, addRef, clearRefs }}>
+    <PostContext.Provider
+      value={{
+        sectionHeaderRefs,
+        postContentWrapperRef,
+        selectedSectionHeader,
+        tableOfContentsRef,
+        tableOfContentsLocked,
+        tableOfContentsY,
+        addSectionHeaderRef,
+        setPostContentWrapperRef,
+        setTableOfContentsRef,
+        clearSectionHeaderRefs,
+      }}
+    >
       {children}
     </PostContext.Provider>
   );

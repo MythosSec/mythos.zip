@@ -8,7 +8,7 @@ import PostContext from "../usePostContext";
 export default function PostEntrySectionHeader({
   title,
 }: IComponentSectionHeaderFields) {
-  const { addRef } = useContext(PostContext);
+  const { addSectionHeaderRef: addRef } = useContext(PostContext);
   const ref = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function PostEntrySectionHeader({
       sx={{ "&:first-of-type": { mt: 0 } }}
       mt={8}
       mb={2}
-      id={`#${encodeClassName(title)}`}
+      id={encodeClassName(title)}
     >
       {title}
     </Typography>
