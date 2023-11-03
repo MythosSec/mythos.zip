@@ -3,10 +3,9 @@ import { Catamaran, Inconsolata } from "next/font/google";
 import ThemeRegistry from "./ThemeRegistry";
 import Canvas from "./components/Canvas";
 import { Stack } from "@mui/joy";
-import Header from "./components/Header";
 import clsx from "clsx";
-import Footer from "./components/Footer";
 import { getSocials } from "./api/contentful";
+import ContentRoot from "./components/ContentRoot";
 
 // inspiration
 // https://www.awwwards.com/inspiration/blog-blog-blog-mohamed-essam-portfolio
@@ -77,20 +76,14 @@ export default async function RootLayout({
             justifyContent="center"
             alignContent="center"
             flexDirection="row"
+            sx={{
+              "@media(max-width: 600px)": {
+                overflow: "hidden",
+              },
+            }}
           >
             <Canvas />
-            <Stack
-              zIndex={2}
-              width="100%"
-              height="100%"
-              maxWidth={1200}
-              mx={2}
-              my={4}
-            >
-              <Header mb={12} socials={socials.fields} />
-              <main>{children}</main>
-              <Footer mt={30} />
-            </Stack>
+            <ContentRoot socials={socials.fields}>{children}</ContentRoot>
           </Stack>
         </ThemeRegistry>
       </body>

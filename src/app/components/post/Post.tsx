@@ -1,4 +1,5 @@
-import { Divider, Stack } from "@mui/joy";
+"use client";
+import { Divider, Stack, Theme, styled, useTheme } from "@mui/joy";
 import { BlogPostSkeleton, SocialMediaSkeleton } from "../../api/contentful";
 import ScrollProgress from "../ScrollProgress";
 import PostHeader from "./PostHeader";
@@ -7,6 +8,29 @@ import { PostContextProvider } from "./usePostContext";
 import PostTags from "./PostTags";
 import PostSocials from "./PostSocials";
 import PostNavigation from "./PostNavigation";
+import { useMediaQuery } from "@mui/material";
+
+const StyledStack = styled(Stack)<{ theme: Theme }>`
+  & .left-gutter {
+    min-width: 180px;
+
+    ${({ theme }) => theme.breakpoints.down("md")} {
+      min-width: 130px;
+    }
+
+    ${({ theme }) => theme.breakpoints.down("sm")} {
+      padding: 0;
+    }
+  }
+
+  & .right-gutter {
+    width: 100%;
+
+    ${({ theme }) => theme.breakpoints.down("sm")} {
+      padding: 0;
+    }
+  }
+`;
 
 export default function Post({
   readLength,
@@ -21,10 +45,12 @@ export default function Post({
   next: BlogPostSkeleton["fields"];
   previous: BlogPostSkeleton["fields"];
 }) {
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <PostContextProvider>
       <ScrollProgress />
-      <Stack>
+      <StyledStack theme={theme}>
         <PostHeader
           mb={6}
           title={post.title}
@@ -40,11 +66,12 @@ export default function Post({
           showFeaturedImage={post.showFeaturedImage}
           showTableOfContents={post.showTableOfContents}
         />
-        <PostTags mt={10} tags={post.tags} />
+        {isSm && <Divider sx={{ mt: 6 }} />}
+        <PostTags mt={isSm ? 6 : 10} tags={post.tags} />
         <PostSocials mt={6} socials={socials} />
-        <Divider sx={{ mt: 12 }} />
+        <Divider sx={{ mt: isSm ? 6 : 12 }} />
         <PostNavigation mt={8} next={next} previous={previous} />
-      </Stack>
+      </StyledStack>
     </PostContextProvider>
   );
 }

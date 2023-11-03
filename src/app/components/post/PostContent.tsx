@@ -1,15 +1,12 @@
 "use client";
-import { Stack, StackProps } from "@mui/joy";
+import { Stack, StackProps, useTheme } from "@mui/joy";
 import { Document } from "@contentful/rich-text-types";
 import PostContentDocument from "./content/PostContentDocument";
 import TableOfContents from "./TableOfContents";
 import Sheet from "../Sheet";
 import { Asset } from "contentful";
 import Image from "../Image";
-import { useContext, useEffect, useRef } from "react";
-import PostContext from "./usePostContext";
-
-const gutterWidth = 180;
+import { useMediaQuery } from "@mui/material";
 
 export default function PostContent({
   document,
@@ -23,22 +20,28 @@ export default function PostContent({
   showFeaturedImage?: boolean;
   showTableOfContents?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { setPostContentWrapperRef } = useContext(PostContext);
-
-  useEffect(() => {
-    if (ref) {
-      setPostContentWrapperRef!(ref);
-    }
-  }, [ref, setPostContentWrapperRef]);
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Stack flexDirection="row" position="relative" {...props}>
-      {showTableOfContents && <TableOfContents document={document} mt={6} />}
-      <Stack minWidth={gutterWidth} />
-      <Stack>
+    <Stack
+      position="relative"
+      flexDirection={isSm ? "column" : "row"}
+      {...props}
+    >
+      {showTableOfContents && (
+        <Stack
+          className="left-gutter"
+          position="sticky"
+          overflow="initial"
+          display={isSm ? "none" : "block"}
+        >
+          <TableOfContents document={document} pb={4} />
+        </Stack>
+      )}
+      <Stack className="right-gutter">
         {featuredImage && showFeaturedImage && (
-          <Stack mb={8}>
+          <Stack mb={isSm ? 4 : 8}>
             <Image
               src={`https:${featuredImage.fields.file!.url}`}
               alt={(featuredImage.fields.title as string) || ""}
@@ -49,10 +52,18 @@ export default function PostContent({
             />
           </Stack>
         )}
-        <Sheet variant="glass" sx={{ p: 4, "& > *:last-child": { mb: 0 } }}>
-          <div ref={ref}>
-            <PostContentDocument {...document} />
-          </div>
+        <Sheet
+          variant={isSm ? "soft" : "glass"}
+          sx={{
+            p: 4,
+            [theme.breakpoints.down("sm")]: {
+              p: 0,
+              background: "transparent",
+            },
+            "& > *:last-child": { mb: 0 },
+          }}
+        >
+          <PostContentDocument {...document} />
         </Sheet>
       </Stack>
     </Stack>

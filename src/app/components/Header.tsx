@@ -101,6 +101,7 @@ export default function Header({
               open={open}
               anchorEl={buttonRef.current}
               disablePortal
+              placement="bottom-end"
             >
               <ClickAwayListener onClickAway={onClose}>
                 <MenuList

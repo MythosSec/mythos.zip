@@ -1,8 +1,8 @@
-import { Stack, StackProps, Typography } from "@mui/joy";
+"use client";
+import { Stack, StackProps, Typography, useTheme } from "@mui/joy";
 import { SocialMediaSkeleton } from "@/app/api/contentful";
 import LinkList from "./LinkList";
-
-const gutterWidth = 180;
+import { useMediaQuery } from "@mui/material";
 
 export default function PostSocials({
   socials,
@@ -10,14 +10,21 @@ export default function PostSocials({
 }: StackProps & {
   socials: SocialMediaSkeleton["fields"];
 }) {
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
-    <Stack flexDirection="row" position="relative" {...props}>
-      <Stack minWidth={gutterWidth}>
+    <Stack
+      flexDirection={isSm ? "column" : "row"}
+      position="relative"
+      {...props}
+    >
+      <Stack className="left-gutter">
         <Typography level="title-lg" mt={1.5}>
           Follow me
         </Typography>
       </Stack>
-      <Stack flexDirection="row" px={4}>
+      <Stack className="right-gutter" flexDirection="row" px={4}>
         <LinkList
           links={socials.fields
             .filter(({ fields: { enabled } }) => enabled)

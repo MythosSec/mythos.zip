@@ -1,11 +1,12 @@
-import { Link, Stack, StackProps, Typography } from "@mui/joy";
+"use client";
+import { Link, Stack, StackProps, Typography, useTheme } from "@mui/joy";
 import {
   IComponentAuthor,
   IComponentSeries,
 } from "../../../../types/contentful";
 import { parsePostDate } from "@/app/util/date";
-import { encodeClassName } from "@/app/util/string";
 import { authorRoute, seriesRoute } from "@/app/routes";
+import { useMediaQuery } from "@mui/material";
 
 export default function PostHeader({
   title,
@@ -23,6 +24,8 @@ export default function PostHeader({
   series?: IComponentSeries;
   author: IComponentAuthor;
 }) {
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <Stack {...props}>
       <Stack mb={0.2}>
@@ -34,7 +37,10 @@ export default function PostHeader({
           <Typography>{parsePostDate(publishedDate)}</Typography>
         </Typography>
       </Stack>
-      <Stack flexDirection="row" justifyContent="space-between">
+      <Stack
+        flexDirection={isSm ? "column" : "row"}
+        justifyContent="space-between"
+      >
         <Stack>
           <Stack>
             <Typography level="h3" ml={-0.4}>
@@ -47,7 +53,7 @@ export default function PostHeader({
             )}
           </Stack>
         </Stack>
-        <Stack flexDirection="row" alignItems="center" ml={4}>
+        <Stack flexDirection="row" alignItems="center" ml={isSm ? 0 : 4}>
           <Typography level="body-md">
             {readLength}&nbsp;minute&nbsp;read
           </Typography>

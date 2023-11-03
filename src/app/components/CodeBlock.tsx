@@ -13,9 +13,9 @@ function CodeBlock({
     <ClientOnly>
       <Stack
         sx={{
-          mx: 4,
           "& > div": {
             p: 2,
+            overflow: "scroll",
           },
           "& button": {
             border: "2px solid transparent",

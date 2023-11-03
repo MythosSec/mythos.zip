@@ -1,10 +1,9 @@
+"use client";
 import { BlogPostSkeleton } from "@/app/api/contentful";
-import { encodeClassName } from "@/app/util/string";
-import { Stack, StackProps, Typography } from "@mui/joy";
+import { Box, Stack, StackProps, Typography, useTheme } from "@mui/joy";
 import LinkList from "./LinkList";
 import { tagRoute } from "@/app/routes";
-
-const gutterWidth = 180;
+import { useMediaQuery } from "@mui/material";
 
 export default function PostTags({
   tags,
@@ -12,18 +11,29 @@ export default function PostTags({
 }: StackProps & {
   tags: BlogPostSkeleton["fields"]["tags"];
 }) {
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+
   if (!tags || tags.length === 0) {
     return null;
   }
 
   return (
-    <Stack flexDirection="row" position="relative" {...props}>
-      <Stack minWidth={gutterWidth}>
+    <Stack
+      flexDirection={isSm ? "column" : "row"}
+      position="relative"
+      {...props}
+    >
+      <Stack className="left-gutter">
         <Typography level="title-lg" mt={1.5}>
           Tags
         </Typography>
       </Stack>
-      <Stack flexDirection="row" px={4}>
+      <Box
+        className="right-gutter"
+        px={4}
+        sx={{ "& > div": { float: "left" } }}
+      >
         <LinkList
           links={tags
             .filter(({ fields: { internalOnly } }) => !internalOnly)
@@ -32,7 +42,7 @@ export default function PostTags({
               url: tagRoute(name),
             }))}
         />
-      </Stack>
+      </Box>
     </Stack>
   );
 }

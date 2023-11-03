@@ -301,7 +301,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
     canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
     // // draw vertical slide gradient
-    canvas!.globalAlpha = 0.8;
+    canvas!.globalAlpha = 0.7;
     gradient = canvas!.createLinearGradient(
       Math.floor(currentWidth * 0.55 + 500),
       -200 - top,

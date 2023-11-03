@@ -1,7 +1,7 @@
 import { extendTheme } from "@mui/joy";
 import Link from "./components/Link";
 
-const theme = extendTheme({
+const Theme = extendTheme({
   colorSchemes: {
     dark: {
       palette: {
@@ -44,7 +44,6 @@ const theme = extendTheme({
   fontFamily: {
     body: "var(--font-body)",
     display: "var(--font-display)",
-    display2: "var(--font-display2)",
     code: "var(--font-monospace)",
   },
   components: {
@@ -65,4 +64,4 @@ const theme = extendTheme({
   },
 });
 
-export default theme;
+export default Theme;
