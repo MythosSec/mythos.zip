@@ -7,19 +7,20 @@ import Sheet from "./Sheet";
 
 function CopyBlock({
   theme = atomOneLight,
-  children,
   showLineNumbers = false,
+  text,
   ...props
-}: Omit<ComponentProps<typeof CopyBlockLib>, "text"> & {
-  children: string;
+}: ComponentProps<typeof CopyBlockLib> & {
   showLineNumbers?: boolean;
+  text: string;
 }) {
+  const fullProps = { theme, showLineNumbers, text, ...props };
   return (
     <ClientOnly
       fallback={
         <Sheet variant="plain" sx={{ p: "0.25rem" }}>
           <Box py="2px">
-            {children.split("\n").map((_, index) => (
+            {text.split("\n").map((_, index) => (
               <Typography
                 sx={{ fontFamiy: "var(--font-monospace)" }}
                 key={index}
@@ -49,12 +50,7 @@ function CopyBlock({
           },
         }}
       >
-        <CopyBlockLib
-          {...props}
-          theme={theme}
-          text={children}
-          showLineNumbers={showLineNumbers}
-        />
+        <CopyBlockLib {...fullProps} />
       </Stack>
     </ClientOnly>
   );

@@ -13,7 +13,6 @@ import {
   Typography,
 } from "@mui/joy";
 import Logo from "./Logo";
-import { SocialMediaSkeleton } from "../api/contentful";
 import { styled } from "@mui/joy/styles";
 import { Popper } from "@mui/base/Popper";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
@@ -23,6 +22,7 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import Sheet from "./Sheet";
 import { useCallback, useState, useRef } from "react";
 import { homeRoute } from "../routes";
+import { TypeComponentSocials } from "../api/contentful/types";
 
 const Popup = styled(Popper)({
   zIndex: 1000,
@@ -31,7 +31,7 @@ const Popup = styled(Popper)({
 export default function Header({
   socials,
   ...props
-}: StackProps & { socials: SocialMediaSkeleton["fields"] }) {
+}: StackProps & { socials: TypeComponentSocials[] }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const onClose = useCallback(() => setOpen(false), []);
@@ -113,9 +113,9 @@ export default function Header({
                   }}
                 >
                   <Sheet variant="glass" sx={{ p: 2 }}>
-                    {socials.fields
-                      .filter(({ fields: { enabled } }) => enabled)
-                      .map(({ fields: { name, link } }) => (
+                    {socials
+                      .filter(({ enabled }) => enabled)
+                      .map(({ name, link }) => (
                         <StyledMenuItem key={name}>
                           <Link
                             href={link}

@@ -1,11 +1,15 @@
 import { createClient } from "contentful";
-import {
-  IPageBlogPostFields,
-  IComponentSeoFields,
-  IComponentSocialMediaBlockFields,
-} from "../../../types/contentful";
 import { Metadata } from "next";
 import { formatISO } from "date-fns";
+import {
+  TypePageBlogPostSkeleton,
+  deserializeBlogPost,
+} from "./contentful/types/TypePageBlogPost";
+import {
+  TypeComponentSocialMediaBlockSkeleton,
+  deserializeSocialMediaBlock,
+} from "./contentful/types/TypeComponentSocialMediaBlock";
+import { TypeComponentSeo, TypeComponentAuthor } from "./contentful/types";
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -13,65 +17,59 @@ const client = createClient({
   environment: process.env.CONTENTFUL_ENVIRONMENT,
 });
 
-export interface BlogPostSkeleton {
-  contentTypeId: "pageBlogPost";
-  fields: IPageBlogPostFields;
-}
-
-export interface SocialMediaSkeleton {
-  contentTypeId: "componentSocialMediaBlock";
-  fields: IComponentSocialMediaBlockFields;
-}
+type DateType = `${number}-${number}-${number}T${number}:${number}:${number}Z`;
 
 export const getBlogPosts = () =>
-  client.getEntries<BlogPostSkeleton>({
+  client.getEntries<TypePageBlogPostSkeleton>({
     content_type: "pageBlogPost",
   });
 
 export const getSocials = async () => {
-  const response = await client.getEntries<SocialMediaSkeleton>({
-    content_type: "componentSocialMediaBlock",
-    "fields.internalName[match]": "social media block - default",
-  });
+  const response =
+    await client.getEntries<TypeComponentSocialMediaBlockSkeleton>({
+      content_type: "componentSocialMediaBlock",
+      "fields.internalName[match]": "social media block - default",
+    } as any);
   const [socials] = response.items;
-  return socials;
+  return deserializeSocialMediaBlock(socials);
 };
 
 export const getBlogPost = (entryId: string) =>
-  client.getEntry<BlogPostSkeleton>(entryId);
+  client.getEntry<TypePageBlogPostSkeleton>(entryId);
 
 export const getBlogPostBySlug = async (slug: string) => {
-  const response = await client.getEntries<BlogPostSkeleton>({
+  const response = await client.getEntries<TypePageBlogPostSkeleton>({
     content_type: "pageBlogPost",
     "fields.slug[match]": slug,
-    "fields.publishedDate[lt]": formatISO(new Date()),
+    "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
     include: 10,
-  });
+  } as any);
   const [item] = response.items.filter((item) => item.fields.slug === slug);
-
-  return item;
+  return deserializeBlogPost(item);
 };
 
-// 2013-01-01T00:00:00Z
-export const getSurroundingBlogPosts = async (publishedDate: string) => {
+export const getSurroundingBlogPosts = async (publishedDate: DateType) => {
   const [nextResponse, previousResponse] = await Promise.all([
-    client.getEntries<BlogPostSkeleton>({
+    client.getEntries<TypePageBlogPostSkeleton>({
       content_type: "pageBlogPost",
       "fields.publishedDate[gt]": publishedDate,
-      "fields.publishedDate[lt]": formatISO(new Date()),
-      select: "fields.slug,fields.title",
+      "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
+      select: ["fields.slug", "fields.title"],
       limit: 1,
-    }),
-    client.getEntries<BlogPostSkeleton>({
+    } as any),
+    client.getEntries<TypePageBlogPostSkeleton>({
       content_type: "pageBlogPost",
       "fields.publishedDate[lt]": publishedDate,
-      select: "fields.slug,fields.title",
+      select: ["fields.slug", "fields.title"],
       limit: 1,
-    }),
+    } as any),
   ]);
   const [next] = nextResponse.items;
   const [previous] = previousResponse.items;
-  return { next, previous };
+  return {
+    next: deserializeBlogPost(next),
+    previous: deserializeBlogPost(previous),
+  };
 };
 
 export const parseMetadata = ({
@@ -86,11 +84,13 @@ export const parseMetadata = ({
   twitter,
   openGraph,
   robots,
-}: IComponentSeoFields & { locale?: string }): Metadata => ({
+  name: author,
+}: TypeComponentSeo & TypeComponentAuthor & { locale?: string }): Metadata => ({
   title: pageTitle,
   description: pageDescription,
   applicationName,
   referrer,
+  authors: [{ name: author }],
   keywords,
   creator,
   publisher,
@@ -100,27 +100,27 @@ export const parseMetadata = ({
     telephone: false,
   },
   robots: {
-    index: (robots.fields as any).index,
-    follow: (robots.fields as any).follow,
-    nocache: !(robots.fields as any).cache,
+    index: robots.index,
+    follow: robots.follow,
+    nocache: !robots.cache,
     googleBot: {
-      index: (robots.fields as any).index,
-      follow: (robots.fields as any).follow,
-      "max-image-preview": (robots.fields as any).maxImagePreview,
+      index: robots.index,
+      follow: robots.follow,
+      "max-image-preview": robots.maxImagePreview,
     },
   },
   twitter: {
-    title: (twitter.fields as any).title,
-    description: (twitter.fields as any).description,
-    siteId: (twitter.fields as any).siteId,
-    creator: (twitter.fields as any).creator,
-    creatorId: (twitter.fields as any).creatorId,
-    card: (twitter.fields as any).card,
+    title: twitter.title,
+    description: twitter.description,
+    siteId: twitter.siteId,
+    creator: twitter.creator,
+    creatorId: twitter.creatorId,
+    card: twitter.card,
   },
   openGraph: {
-    title: (openGraph.fields as any).title,
-    description: (openGraph.fields as any).description,
-    siteName: (openGraph.fields as any).siteName,
+    title: openGraph.title,
+    description: openGraph.description,
+    siteName: openGraph.siteName,
     locale,
     type: "website",
   },

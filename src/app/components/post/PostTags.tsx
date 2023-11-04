@@ -1,15 +1,15 @@
 "use client";
-import { BlogPostSkeleton } from "@/app/api/contentful";
 import { Box, Stack, StackProps, Typography, useTheme } from "@mui/joy";
 import LinkList from "./LinkList";
 import { tagRoute } from "@/app/routes";
 import { useMediaQuery } from "@mui/material";
+import { TypeComponentTag } from "@/app/api/contentful/types";
 
 export default function PostTags({
   tags,
   ...props
 }: StackProps & {
-  tags: BlogPostSkeleton["fields"]["tags"];
+  tags: TypeComponentTag[];
 }) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -26,7 +26,7 @@ export default function PostTags({
     >
       <Stack className="left-gutter">
         <Typography level="title-lg" mt={1.5}>
-          Tags
+          Topics
         </Typography>
       </Stack>
       <Box
@@ -36,8 +36,8 @@ export default function PostTags({
       >
         <LinkList
           links={tags
-            .filter(({ fields: { internalOnly } }) => !internalOnly)
-            .map(({ fields: { name } }) => ({
+            .filter(({ internalOnly }) => !internalOnly)
+            .map(({ name }) => ({
               name,
               url: tagRoute(name),
             }))}

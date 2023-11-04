@@ -2,14 +2,14 @@
 import { Stack, useTheme } from "@mui/joy";
 import Header from "./Header";
 import Footer from "./Footer";
-import { SocialMediaSkeleton } from "../api/contentful";
 import { ReactNode } from "react";
+import { TypeComponentSocials } from "../api/contentful/types";
 
 export default function ContentRoot({
   socials,
   children,
 }: {
-  socials: SocialMediaSkeleton["fields"];
+  socials: TypeComponentSocials[];
   children: ReactNode;
 }) {
   const theme = useTheme();

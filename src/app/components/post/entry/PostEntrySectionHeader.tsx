@@ -1,13 +1,13 @@
 "use client";
 import { Typography } from "@mui/joy";
-import { IComponentSectionHeaderFields } from "../../../../../types/contentful";
 import { encodeClassName } from "@/app/util/string";
 import { useContext, useEffect, useRef } from "react";
 import PostContext from "../usePostContext";
+import { TypeComponentSectionHeader } from "@/app/api/contentful/types";
 
 export default function PostEntrySectionHeader({
   title,
-}: IComponentSectionHeaderFields) {
+}: TypeComponentSectionHeader) {
   const { addSectionHeaderRef: addRef } = useContext(PostContext);
   const ref = useRef<HTMLParagraphElement>(null);
 

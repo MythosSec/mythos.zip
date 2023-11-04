@@ -6,7 +6,7 @@ import {
 } from "@/app/api/contentful";
 import Post from "@/app/components/post/Post";
 import { calculateReadLength } from "@/app/util/contentful";
-import { Metadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
 
 export default async function BlogPost({
   params: { id },
@@ -15,27 +15,35 @@ export default async function BlogPost({
 }) {
   const post = await getBlogPostBySlug(id);
   const { next, previous } = await getSurroundingBlogPosts(
-    post.fields.publishedDate
+    post.publishedDate as Parameters<typeof getSurroundingBlogPosts>[0]
   );
   const socials = await getSocials();
-  const readLength = Math.floor(calculateReadLength(post.fields.content));
+  const readLength = Math.floor(calculateReadLength(post.content));
   return (
     <Post
-      post={post.fields}
-      socials={socials?.fields}
+      post={post}
+      socials={socials}
       readLength={readLength}
-      next={next?.fields}
-      previous={previous?.fields}
+      next={next}
+      previous={previous}
     />
   );
 }
 
-export async function generateMetadata({
-  params: { id },
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const response = await getBlogPostBySlug(id);
-  //   console.log(JSON.stringify(response, undefined, 4));
-  return parseMetadata((response.fields.seoFields as any).fields);
+export async function generateMetadata(
+  {
+    params: { id },
+  }: {
+    params: { id: string };
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const [metadata, post] = await Promise.all([parent, getBlogPostBySlug(id)]);
+  return {
+    ...(metadata as any),
+    ...parseMetadata({
+      ...post.seoFields,
+      ...post.author,
+    }),
+  };
 }

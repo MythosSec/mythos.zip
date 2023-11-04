@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "types": ["./types/*", "node"],
+    "types": ["node"],
     "incremental": true,
     "plugins": [
       {

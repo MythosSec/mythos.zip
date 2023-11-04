@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Catamaran, Inconsolata } from "next/font/google";
 import ThemeRegistry from "./ThemeRegistry";
 import Canvas from "./components/Canvas";
@@ -19,10 +19,16 @@ const monospace = Inconsolata({
   weight: "600",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  colorScheme: "dark",
+};
+
 export const metadata: Metadata = {
   title: "MythosSec",
+  metadataBase: new URL(`https://${process.env.DOMAIN}`),
   description: "MythosSec",
-  applicationName: "Mythos",
+  applicationName: "MythosSec",
   authors: [{ name: "Mythos" }],
   creator: "Mythos",
   manifest: "/site.webmanifest",
@@ -83,7 +89,7 @@ export default async function RootLayout({
             }}
           >
             <Canvas />
-            <ContentRoot socials={socials.fields}>{children}</ContentRoot>
+            <ContentRoot socials={socials}>{children}</ContentRoot>
           </Stack>
         </ThemeRegistry>
       </body>

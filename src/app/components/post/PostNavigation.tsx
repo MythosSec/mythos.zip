@@ -1,16 +1,16 @@
-import { BlogPostSkeleton } from "@/app/api/contentful";
 import { Link, Stack, StackProps, Typography } from "@mui/joy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { articleRoute } from "@/app/routes";
+import { TypePageBlogPost } from "@/app/api/contentful/types";
 
 export default function PostNavigation({
   next,
   previous,
   ...props
 }: StackProps & {
-  previous: BlogPostSkeleton["fields"] | undefined;
-  next: BlogPostSkeleton["fields"] | undefined;
+  previous: TypePageBlogPost | undefined;
+  next: TypePageBlogPost | undefined;
 }) {
   return (
     <Stack flexDirection="row" justifyContent="space-between" {...props}>

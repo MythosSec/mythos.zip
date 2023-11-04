@@ -1,6 +1,5 @@
 "use client";
 import { Divider, Stack, Theme, styled, useTheme } from "@mui/joy";
-import { BlogPostSkeleton, SocialMediaSkeleton } from "../../api/contentful";
 import ScrollProgress from "../ScrollProgress";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
@@ -9,6 +8,10 @@ import PostTags from "./PostTags";
 import PostSocials from "./PostSocials";
 import PostNavigation from "./PostNavigation";
 import { useMediaQuery } from "@mui/material";
+import {
+  TypeComponentSocials,
+  TypePageBlogPost,
+} from "@/app/api/contentful/types";
 
 const StyledStack = styled(Stack)<{ theme: Theme }>`
   & .left-gutter {
@@ -40,10 +43,10 @@ export default function Post({
   previous,
 }: {
   readLength: number;
-  socials: SocialMediaSkeleton["fields"];
-  post: BlogPostSkeleton["fields"];
-  next: BlogPostSkeleton["fields"];
-  previous: BlogPostSkeleton["fields"];
+  socials: TypeComponentSocials[];
+  post: TypePageBlogPost;
+  next: TypePageBlogPost;
+  previous: TypePageBlogPost;
 }) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));

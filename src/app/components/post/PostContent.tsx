@@ -41,7 +41,7 @@ export default function PostContent({
       )}
       <Stack className="right-gutter">
         {featuredImage && showFeaturedImage && (
-          <Stack mb={isSm ? 4 : 8}>
+          <Stack mb={isSm ? 4 : 6}>
             <Image
               src={`https:${featuredImage.fields.file!.url}`}
               alt={(featuredImage.fields.title as string) || ""}
@@ -55,7 +55,7 @@ export default function PostContent({
         <Sheet
           variant={isSm ? "soft" : "glass"}
           sx={{
-            p: 4,
+            p: 6,
             [theme.breakpoints.down("sm")]: {
               p: 0,
               background: "transparent",

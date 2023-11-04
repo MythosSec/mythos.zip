@@ -64,6 +64,7 @@ export default function ThemeRegistry(props: { options: any; children: any }) {
               width: "100vw",
             },
             body: {
+              fontSize: 18,
               minHeight: "100vh",
               width: "100vw",
               background:

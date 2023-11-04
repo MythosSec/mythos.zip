@@ -23,8 +23,6 @@ function Logo({ size = 100, text = true }: { size?: number; text?: boolean }) {
         <Image
           src={logoText}
           alt="mythos"
-          sizes="100vw"
-          quality={100}
           width={size / 0.7142857142857143}
           style={{
             zIndex: 2,

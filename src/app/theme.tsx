@@ -40,6 +40,13 @@ const Theme = extendTheme({
     "body-sm": {
       color: "var(--joy-palette-text-primary)",
     },
+    "body-md": {
+      fontSize: "var(--joy-fontSize-xl, 1.25rem)",
+      lineHeight: "var(--joy-lineHeight-lg, 1.55556)",
+    },
+    "body-lg": {
+      fontSize: "var(--joy-fontSize-cl2, 1.5rem)",
+    },
   },
   fontFamily: {
     body: "var(--font-body)",

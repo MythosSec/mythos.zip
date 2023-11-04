@@ -1,15 +1,15 @@
 "use client";
 import { Stack, useTheme } from "@mui/joy";
-import { ICodeFields } from "../../../../../types/contentful";
 import CodeBlock from "../../CodeBlock";
 import CopyBlock from "../../CopyBlock";
+import { TypeCode } from "@/app/api/contentful/types";
 
 export default function PostEntryCodeBlock({
   showCopyButton,
-  text,
   wordWrap,
   ...props
-}: ICodeFields) {
+}: TypeCode) {
+  console.log(props);
   const theme = useTheme();
   const styles = {
     [theme.breakpoints.down("sm")]: {
@@ -20,15 +20,13 @@ export default function PostEntryCodeBlock({
   if (showCopyButton) {
     return (
       <Stack my={4} mx={4} sx={styles}>
-        <CopyBlock {...props}>{text}</CopyBlock>
+        <CopyBlock {...props} />
       </Stack>
     );
   }
   return (
     <Stack my={4} mx={4} sx={styles}>
-      <CodeBlock {...props} wrapLongLines={wordWrap}>
-        {text}
-      </CodeBlock>
+      <CodeBlock {...props} wrapLongLines={wordWrap} />
     </Stack>
   );
 }

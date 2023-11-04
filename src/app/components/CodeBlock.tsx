@@ -6,9 +6,8 @@ import ClientOnly from "./ClientOnly";
 
 function CodeBlock({
   theme = atomOneLight,
-  children,
   ...props
-}: Omit<ComponentProps<typeof CodeBlockLib>, "text"> & { children: string }) {
+}: ComponentProps<typeof CodeBlockLib>) {
   return (
     <ClientOnly>
       <Stack
@@ -29,7 +28,7 @@ function CodeBlock({
           },
         }}
       >
-        <CodeBlockLib {...props} theme={theme} text={children} />
+        <CodeBlockLib {...props} theme={theme} />
       </Stack>
     </ClientOnly>
   );

@@ -1,12 +1,12 @@
 "use client";
 import { Link, Stack, StackProps, Typography, useTheme } from "@mui/joy";
-import {
-  IComponentAuthor,
-  IComponentSeries,
-} from "../../../../types/contentful";
 import { parsePostDate } from "@/app/util/date";
 import { authorRoute, seriesRoute } from "@/app/routes";
 import { useMediaQuery } from "@mui/material";
+import {
+  TypeComponentAuthor,
+  TypeComponentSeries,
+} from "@/app/api/contentful/types";
 
 export default function PostHeader({
   title,
@@ -21,8 +21,8 @@ export default function PostHeader({
   shortDescription?: string;
   publishedDate: string;
   readLength: number;
-  series?: IComponentSeries;
-  author: IComponentAuthor;
+  series?: TypeComponentSeries;
+  author: TypeComponentAuthor;
 }) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -30,8 +30,8 @@ export default function PostHeader({
     <Stack {...props}>
       <Stack mb={0.2}>
         <Typography>
-          <Link fontWeight="bold" href={authorRoute(author.fields.name)}>
-            {author.fields.name}
+          <Link fontWeight="bold" href={authorRoute(author.name)}>
+            {author.name}
           </Link>
           <Typography textColor="text.tertiary">&nbsp;—&nbsp;</Typography>
           <Typography>{parsePostDate(publishedDate)}</Typography>
@@ -62,8 +62,8 @@ export default function PostHeader({
       <Stack mt={3}>
         {series && (
           <Typography>
-            <Link fontWeight="bold" href={seriesRoute(series.fields.name)}>
-              {series.fields.name}
+            <Link fontWeight="bold" href={seriesRoute(series.name)}>
+              {series.name}
             </Link>
             &nbsp;series
           </Typography>

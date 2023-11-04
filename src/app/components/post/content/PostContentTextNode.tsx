@@ -31,7 +31,5 @@ export default function PostContentTextNode({
     }
   });
 
-  // console.log(`${new Array(depth).fill("\t").join("")}${nodeType}`);
-
   return child;
 }

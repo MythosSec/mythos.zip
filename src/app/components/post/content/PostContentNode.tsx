@@ -73,8 +73,6 @@ export default function PostContentNode({
     }
   }
 
-  // console.log(`${new Array(depth).fill("\t").join("")}${nodeType}`);
-
   if (nodeType === BLOCKS.EMBEDDED_ENTRY) {
     return <PostContentEmbeddedEntry {...props} />;
   } else if (nodeType === BLOCKS.TABLE) {
