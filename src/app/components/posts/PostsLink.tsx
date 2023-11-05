@@ -1,34 +1,28 @@
 "use client";
 import { getBlogPosts } from "@/app/api/contentful";
-import { articleRoute, authorRoute, seriesRoute } from "@/app/routes";
+import { articleRoute, seriesRoute } from "@/app/routes";
 import { parsePostDate } from "@/app/util/date";
 import { useMediaQuery } from "@mui/material";
-import { Stack, Typography, Link, useTheme, LinkProps } from "@mui/joy";
+import { Stack, Typography, Link, useTheme, StackProps } from "@mui/joy";
+import LinkN from "next/link";
 
 export default function PostsLink({
-  post: {
-    slug,
-    shortDescription,
-    title,
-    series,
-    publishedDate,
-    author,
-    readLength,
-  },
+  post: { slug, shortDescription, title, series, publishedDate, readLength },
   ...props
 }: {
   post: Awaited<ReturnType<typeof getBlogPosts>>["items"][0];
-} & LinkProps) {
+} & StackProps) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
-    <Link
-      display="flex"
-      flexDirection="column"
-      href={articleRoute(slug)}
-      {...props}
-    >
-      <Stack width="100%">
+    <Stack {...props} sx={{ "&:first-child": { mt: 0 } }}>
+      <Link
+        display="flex"
+        flexDirection="column"
+        alignItems="flex-start"
+        href={articleRoute(slug)}
+        width="100%"
+      >
         <Stack mb={0.2}>
           <Typography>
             <Typography>{parsePostDate(publishedDate)}</Typography>
@@ -37,6 +31,7 @@ export default function PostsLink({
         <Stack
           flexDirection={isSm ? "column" : "row"}
           justifyContent="space-between"
+          width="100%"
         >
           <Stack>
             <Stack>
@@ -56,17 +51,17 @@ export default function PostsLink({
             </Typography>
           </Stack>
         </Stack>
-        {series && (
-          <Stack mt={3}>
-            <Typography>
-              <Link fontWeight="bold" href={seriesRoute(series.name)}>
-                {series.name}
-              </Link>
-              &nbsp;series
-            </Typography>
-          </Stack>
-        )}
-      </Stack>
-    </Link>
+      </Link>
+      {series && (
+        <Stack mt={3}>
+          <Typography>
+            <Link fontWeight="bold" href={seriesRoute(series.name)}>
+              {series.name}
+            </Link>
+            &nbsp;series
+          </Typography>
+        </Stack>
+      )}
+    </Stack>
   );
 }

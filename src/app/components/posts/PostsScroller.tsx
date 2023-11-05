@@ -11,7 +11,7 @@ export default function PostsScroller({
   posts: Awaited<ReturnType<typeof getBlogPosts>>["items"];
 } & StackProps) {
   return (
-    <Stack {...props} sx={{ "& > *:first-child": { mt: "0!important" } }}>
+    <Stack {...props}>
       {posts.map((post, index) => (
         <PostsLink key={index} mt={12} post={post} />
       ))}

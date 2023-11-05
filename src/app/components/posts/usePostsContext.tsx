@@ -61,11 +61,11 @@ export function PostsContextProvider({
     if (!postsRemaining) {
       return;
     }
+    setState((state) => ({ ...state, loading: true }));
 
     const response = await fetch(
       `/api/v1/getBlogPosts?page=${page + 1}&limit=${limit}`
     );
-    setState((state) => ({ ...state, loading: true }));
     const data = (await response.json()) as Awaited<
       ReturnType<typeof getBlogPosts>
     >;
