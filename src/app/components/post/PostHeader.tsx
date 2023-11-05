@@ -59,16 +59,16 @@ export default function PostHeader({
           </Typography>
         </Stack>
       </Stack>
-      <Stack mt={3}>
-        {series && (
+      {series && (
+        <Stack mt={3}>
           <Typography>
             <Link fontWeight="bold" href={seriesRoute(series.name)}>
               {series.name}
             </Link>
             &nbsp;series
           </Typography>
-        )}
-      </Stack>
+        </Stack>
+      )}
     </Stack>
   );
 }

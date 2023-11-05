@@ -71,7 +71,9 @@ export default function Header({
       {...props}
       component="header"
     >
-      <Logo size={60} />
+      <Link href={homeRoute()}>
+        <Logo size={60} />
+      </Link>
       <Stack>
         <List role="menubar" orientation="horizontal">
           <ListItem role="none">

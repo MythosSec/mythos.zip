@@ -9,7 +9,6 @@ export default function PostEntryCodeBlock({
   wordWrap,
   ...props
 }: TypeCode) {
-  console.log(props);
   const theme = useTheme();
   const styles = {
     [theme.breakpoints.down("sm")]: {

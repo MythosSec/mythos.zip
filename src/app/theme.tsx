@@ -38,6 +38,8 @@ const Theme = extendTheme({
       fontSize: "2rem",
     },
     "body-sm": {
+      fontSize: "var(--joy-fontSize-lg, 1.125rem)",
+      lineHeight: "var(--joy-lineHeight-lg, 1.5)",
       color: "var(--joy-palette-text-primary)",
     },
     "body-md": {
@@ -45,7 +47,8 @@ const Theme = extendTheme({
       lineHeight: "var(--joy-lineHeight-lg, 1.55556)",
     },
     "body-lg": {
-      fontSize: "var(--joy-fontSize-cl2, 1.5rem)",
+      fontSize: "var(--joy-fontSize-xl2, 1.5rem)",
+      lineHeight: "var(--joy-lineHeight-lg, 1.66667)",
     },
   },
   fontFamily: {

@@ -61,6 +61,7 @@ export default function PostContent({
               background: "transparent",
             },
             "& > *:last-child": { mb: 0 },
+            "& > p, & > ul": { mb: 3 },
           }}
         >
           <PostContentDocument {...document} />

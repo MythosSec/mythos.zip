@@ -32,7 +32,7 @@ export default function ContentRoot({
     >
       <Header mb={12} socials={socials} />
       <main>{children}</main>
-      <Footer mt={30} />
+      <Footer pt={10} mt={30} mb={8} />
     </Stack>
   );
 }

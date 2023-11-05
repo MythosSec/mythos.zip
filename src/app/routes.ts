@@ -10,4 +10,4 @@ export const authorRoute = (author: string) =>
 export const seriesRoute = (series: string) =>
   `/series/${encodeClassName(series)}`;
 
-export const tagRoute = (tag: string) => `/tag/${encodeClassName(tag)}`;
+export const tagRoute = (tag: string) => `/topic/${encodeClassName(tag)}`;

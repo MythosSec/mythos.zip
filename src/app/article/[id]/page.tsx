@@ -14,20 +14,13 @@ export default async function BlogPost({
   params: { id: string };
 }) {
   const post = await getBlogPostBySlug(id);
-  const { next, previous } = await getSurroundingBlogPosts(
-    post.publishedDate as Parameters<typeof getSurroundingBlogPosts>[0]
-  );
-  const socials = await getSocials();
-  const readLength = Math.floor(calculateReadLength(post.content));
-  return (
-    <Post
-      post={post}
-      socials={socials}
-      readLength={readLength}
-      next={next}
-      previous={previous}
-    />
-  );
+  const [{ next, previous }, socials] = await Promise.all([
+    getSurroundingBlogPosts(
+      post.publishedDate as Parameters<typeof getSurroundingBlogPosts>[0]
+    ),
+    getSocials(),
+  ]);
+  return <Post post={post} socials={socials} next={next} previous={previous} />;
 }
 
 export async function generateMetadata(

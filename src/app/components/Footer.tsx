@@ -1,6 +1,7 @@
 "use client";
 import { Stack, StackProps, Typography, Link } from "@mui/joy";
 import StraightIcon from "@mui/icons-material/Straight";
+import Sheet from "./Sheet";
 
 export default function Footer({
   sx = {},
@@ -26,7 +27,7 @@ export default function Footer({
       <Stack>
         <Link
           href="#"
-          fontSize="sm"
+          level="body-sm"
           endDecorator={<StraightIcon htmlColor="text.primary" />}
           onClick={onBackToTopClick}
         >

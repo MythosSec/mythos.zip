@@ -5,8 +5,6 @@ import { Typography } from "@mui/joy";
 export default function PostContentTextNode({
   marks = [],
   value,
-  depth = 0,
-  nodeType,
 }: Text & { depth?: number }) {
   let child: ReactNode = value;
   marks.forEach(({ type }) => {

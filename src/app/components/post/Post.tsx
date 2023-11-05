@@ -12,6 +12,7 @@ import {
   TypeComponentSocials,
   TypePageBlogPost,
 } from "@/app/api/contentful/types";
+import { getBlogPostBySlug } from "@/app/api/contentful";
 
 const StyledStack = styled(Stack)<{ theme: Theme }>`
   & .left-gutter {
@@ -36,15 +37,13 @@ const StyledStack = styled(Stack)<{ theme: Theme }>`
 `;
 
 export default function Post({
-  readLength,
   socials,
   post,
   next,
   previous,
 }: {
-  readLength: number;
   socials: TypeComponentSocials[];
-  post: TypePageBlogPost;
+  post: Awaited<ReturnType<typeof getBlogPostBySlug>>;
   next: TypePageBlogPost;
   previous: TypePageBlogPost;
 }) {
@@ -61,7 +60,7 @@ export default function Post({
           series={post.series}
           publishedDate={post.publishedDate}
           author={post.author}
-          readLength={readLength}
+          readLength={post.readLength}
         />
         <PostContent
           document={post.content}

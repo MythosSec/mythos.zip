@@ -2,6 +2,7 @@ import { createClient } from "contentful";
 import { Metadata } from "next";
 import { formatISO } from "date-fns";
 import {
+  TypePageBlogPost,
   TypePageBlogPostSkeleton,
   deserializeBlogPost,
 } from "./contentful/types/TypePageBlogPost";
@@ -10,6 +11,7 @@ import {
   deserializeSocialMediaBlock,
 } from "./contentful/types/TypeComponentSocialMediaBlock";
 import { TypeComponentSeo, TypeComponentAuthor } from "./contentful/types";
+import { calculateReadLength } from "../util/contentful";
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -19,10 +21,29 @@ const client = createClient({
 
 type DateType = `${number}-${number}-${number}T${number}:${number}:${number}Z`;
 
-export const getBlogPosts = () =>
-  client.getEntries<TypePageBlogPostSkeleton>({
+const getReadLength = (post: TypePageBlogPost) =>
+  Math.max(Math.floor(calculateReadLength(post.content)), 1);
+
+export const getBlogPosts = async (limit = 10, page = 1) => {
+  const response = await client.getEntries<TypePageBlogPostSkeleton>({
     content_type: "pageBlogPost",
-  });
+    order: ["-fields.publishedDate"],
+    "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
+    limit,
+    skip: (page - 1) * limit,
+  } as any);
+  const items = response.items;
+  return {
+    ...response,
+    items: items.map((item) => {
+      const deserialized = deserializeBlogPost(item);
+      return {
+        ...deserialized,
+        readLength: getReadLength(deserialized),
+      };
+    }),
+  };
+};
 
 export const getSocials = async () => {
   const response =
@@ -34,9 +55,6 @@ export const getSocials = async () => {
   return deserializeSocialMediaBlock(socials);
 };
 
-export const getBlogPost = (entryId: string) =>
-  client.getEntry<TypePageBlogPostSkeleton>(entryId);
-
 export const getBlogPostBySlug = async (slug: string) => {
   const response = await client.getEntries<TypePageBlogPostSkeleton>({
     content_type: "pageBlogPost",
@@ -45,7 +63,11 @@ export const getBlogPostBySlug = async (slug: string) => {
     include: 10,
   } as any);
   const [item] = response.items.filter((item) => item.fields.slug === slug);
-  return deserializeBlogPost(item);
+  const deserialized = deserializeBlogPost(item);
+  return {
+    ...deserialized,
+    readLength: getReadLength(deserialized),
+  };
 };
 
 export const getSurroundingBlogPosts = async (publishedDate: DateType) => {

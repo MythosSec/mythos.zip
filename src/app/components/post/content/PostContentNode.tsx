@@ -39,13 +39,17 @@ export default function PostContentNode({
       childProps.level = "h4";
       break;
     case BLOCKS.PARAGRAPH:
-      childProps = { mb: 3 };
       break;
     case BLOCKS.QUOTE:
       Element = BlockQuote;
       break;
     case BLOCKS.UL_LIST:
       Element = List;
+      childProps = { marker: "disc" };
+      break;
+    case BLOCKS.OL_LIST:
+      Element = List;
+      childProps = { marker: "decimal" };
       break;
     case BLOCKS.LIST_ITEM:
       Element = ListItem;

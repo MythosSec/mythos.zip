@@ -1,4 +1,4 @@
-import { Stack, Box } from "@mui/joy";
+import { Stack } from "@mui/joy";
 import { ReactNode } from "react";
 
 export default function BlockQuote({ children }: { children: ReactNode }) {
