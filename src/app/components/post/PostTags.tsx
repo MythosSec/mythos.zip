@@ -1,7 +1,7 @@
 "use client";
-import { Box, Stack, StackProps, Typography, useTheme } from "@mui/joy";
+import { Box, Stack, StackProps, Typography, Link, useTheme } from "@mui/joy";
 import LinkList from "./LinkList";
-import { tagRoute } from "@/app/routes";
+import { tagRoute, tagsRoute } from "@/app/routes";
 import { useMediaQuery } from "@mui/material";
 import { TypeComponentTag } from "@/app/api/contentful/types";
 
@@ -25,9 +25,11 @@ export default function PostTags({
       {...props}
     >
       <Stack className="left-gutter">
-        <Typography level="title-lg" mt={1.5}>
-          Topics
-        </Typography>
+        <Link href={tagsRoute()}>
+          <Typography level="title-lg" mt={1.5}>
+            Topics
+          </Typography>
+        </Link>
       </Stack>
       <Box
         className="right-gutter"

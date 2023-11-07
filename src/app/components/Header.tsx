@@ -3,7 +3,6 @@ import {
   Button,
   Link,
   List,
-  ListDivider,
   ListItem,
   MenuItem,
   MenuItemProps,
@@ -16,12 +15,12 @@ import Logo from "./Logo";
 import { styled } from "@mui/joy/styles";
 import { Popper } from "@mui/base/Popper";
 import { ClickAwayListener } from "@mui/base/ClickAwayListener";
-import Home from "@mui/icons-material/Home";
 import YouTubeIcon from "@mui/icons-material/YouTube";
+import SearchIcon from "@mui/icons-material/Search";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Sheet from "./Sheet";
 import { useCallback, useState, useRef } from "react";
-import { homeRoute } from "../routes";
+import { homeRoute, seriesRoute, tagsRoute } from "../routes";
 import { TypeComponentSocials } from "../api/contentful/types";
 
 const Popup = styled(Popper)({
@@ -60,10 +59,6 @@ export default function Header({
     );
   }
 
-  function StyledDivider() {
-    return <ListDivider sx={{ mx: 1.5 }} />;
-  }
-
   return (
     <Stack
       flexDirection="row"
@@ -71,17 +66,35 @@ export default function Header({
       {...props}
       component="header"
     >
+      <Stack width="30%" flexDirection="row" alignItems="center">
+        <Link href="#">
+          <SearchIcon color="inherit" />
+        </Link>
+      </Stack>
       <Link href={homeRoute()}>
         <Logo size={60} />
       </Link>
-      <Stack>
-        <List role="menubar" orientation="horizontal">
-          <ListItem role="none">
+      <Stack width="30%" alignItems="flex-end">
+        <List
+          role="menubar"
+          orientation="horizontal"
+          sx={{ "& > *": { mr: 2 } }}
+        >
+          {/* <ListItem role="none">
             <Link href={homeRoute()} level="title-sm">
-              <Home />
+              Home
+            </Link>
+          </ListItem> */}
+          <ListItem role="none">
+            <Link href={tagsRoute()} level="title-sm">
+              Topics
             </Link>
           </ListItem>
-          <StyledDivider />
+          <ListItem role="none">
+            <Link href={seriesRoute()} level="title-sm">
+              Series
+            </Link>
+          </ListItem>
           <ListItem role="none">
             <Button
               id="composition-button"
@@ -95,7 +108,7 @@ export default function Header({
               size="sm"
               sx={{ backgroundColor: "transparent !important", px: 0 }}
             >
-              <Typography level="title-md">Contact</Typography>
+              <Typography level="title-sm">Contact</Typography>
             </Button>
             <Popup
               role={undefined}

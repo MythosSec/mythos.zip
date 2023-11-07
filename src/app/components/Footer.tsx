@@ -21,7 +21,7 @@ export default function Footer({
     >
       <Stack>
         <Typography level="body-sm">
-          © MythosSec {new Date().getFullYear()}
+          © Mythos Security {new Date().getFullYear()}
         </Typography>
       </Stack>
       <Stack>

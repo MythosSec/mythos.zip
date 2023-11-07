@@ -1,6 +1,6 @@
 "use client";
 import { getBlogPosts } from "@/app/api/contentful";
-import { articleRoute, seriesRoute } from "@/app/routes";
+import { articleRoute, seriesItemRoute } from "@/app/routes";
 import { parsePostDate } from "@/app/util/date";
 import { useMediaQuery } from "@mui/material";
 import { Stack, Typography, Link, useTheme, StackProps } from "@mui/joy";
@@ -23,39 +23,27 @@ export default function PostsLink({
         href={articleRoute(slug)}
         width="100%"
       >
-        <Stack mb={0.2}>
-          <Typography>
-            <Typography>{parsePostDate(publishedDate)}</Typography>
+        <Typography level="body-sm">
+          <Typography>{parsePostDate(publishedDate)}</Typography>
+        </Typography>
+        <Stack>
+          <Typography level="h3" ml={-0.4}>
+            {title}
           </Typography>
-        </Stack>
-        <Stack
-          flexDirection={isSm ? "column" : "row"}
-          justifyContent="space-between"
-          width="100%"
-        >
-          <Stack>
-            <Stack>
-              <Typography level="h3" ml={-0.4}>
-                {title}
-              </Typography>
-              {shortDescription && (
-                <Typography level="body-lg" mb={0.2}>
-                  {shortDescription}
-                </Typography>
-              )}
-            </Stack>
-          </Stack>
-          <Stack flexDirection="row" alignItems="center" ml={isSm ? 0 : 4}>
-            <Typography level="body-md">
-              {readLength}&nbsp;minute&nbsp;read
+          {shortDescription && (
+            <Typography level="body-lg" mb={0.2}>
+              {shortDescription}
             </Typography>
-          </Stack>
+          )}
         </Stack>
+        <Typography level="body-sm">
+          {readLength}&nbsp;minute&nbsp;read
+        </Typography>
       </Link>
       {series && showSeries && (
         <Stack mt={3}>
           <Typography>
-            <Link fontWeight="bold" href={seriesRoute(series.name)}>
+            <Link fontWeight="bold" href={seriesItemRoute(series.name)}>
               {series.name}
             </Link>
             &nbsp;series

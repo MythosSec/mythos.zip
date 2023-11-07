@@ -1,9 +1,16 @@
 "use client";
 import { getBlogPosts } from "@/app/api/contentful";
-import { articleRoute, seriesRoute } from "@/app/routes";
+import { articleRoute, seriesItemRoute } from "@/app/routes";
 import { parsePostDate } from "@/app/util/date";
 import { useMediaQuery } from "@mui/material";
-import { Stack, Typography, Link, useTheme, StackProps } from "@mui/joy";
+import {
+  Stack,
+  Typography,
+  Link,
+  useTheme,
+  StackProps,
+  Divider,
+} from "@mui/joy";
 
 export default function PostsLinkLatest({
   post: { slug, shortDescription, title, series, publishedDate, readLength },
@@ -16,10 +23,12 @@ export default function PostsLinkLatest({
   return (
     <Stack flexDirection="column" width="100%" {...props}>
       <Link href={articleRoute(slug)}>
-        <Stack mb={0.2}>
+        <Stack>
           <Typography>
             Latest
-            <Typography textColor="text.tertiary">&nbsp;—&nbsp;</Typography>
+            <Typography sx={{ opacity: 0.16 }} mx={1}>
+              —
+            </Typography>
             <Typography>{parsePostDate(publishedDate)}</Typography>
           </Typography>
         </Stack>
@@ -42,17 +51,6 @@ export default function PostsLinkLatest({
         </Stack>
       </Link>
 
-      {series && (
-        <Link fontWeight="bold" href={seriesRoute(series.name)}>
-          <Stack mt={3}>
-            <Typography>
-              {series.name}
-              &nbsp;series
-            </Typography>
-          </Stack>
-        </Link>
-      )}
-
       <Link href={articleRoute(slug)}>
         <Stack flexDirection="row" alignItems="center">
           <Typography level="body-md">
@@ -60,6 +58,17 @@ export default function PostsLinkLatest({
           </Typography>
         </Stack>
       </Link>
+
+      {series && (
+        <Link href={seriesItemRoute(series.name)}>
+          <Stack mt={3}>
+            <Typography>
+              <Typography fontWeight="bold">{series.name}</Typography>
+              &nbsp;series
+            </Typography>
+          </Stack>
+        </Link>
+      )}
     </Stack>
   );
 }

@@ -28,6 +28,6 @@ export async function generateMetadata(
   const metadata = await parent;
   return {
     ...(metadata as any),
-    title: `${series.name} | MythosSec`,
+    title: `${series.name} | Mythos Security`,
   };
 }

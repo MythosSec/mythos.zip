@@ -1,7 +1,7 @@
 "use client";
 import { Link, Stack, StackProps, Typography, useTheme } from "@mui/joy";
 import { parsePostDate } from "@/app/util/date";
-import { seriesRoute } from "@/app/routes";
+import { seriesItemRoute } from "@/app/routes";
 import { useMediaQuery } from "@mui/material";
 import {
   TypeComponentAuthor,
@@ -29,9 +29,11 @@ export default function PostHeader({
   return (
     <Stack {...props}>
       <Stack mb={0.2}>
-        <Typography>
+        <Typography level="body-sm">
           {author.name}
-          <Typography textColor="text.tertiary">&nbsp;—&nbsp;</Typography>
+          <Typography sx={{ opacity: 0.16 }} mx={1}>
+            —
+          </Typography>
           <Typography>{parsePostDate(publishedDate)}</Typography>
         </Typography>
       </Stack>
@@ -52,7 +54,7 @@ export default function PostHeader({
           </Stack>
         </Stack>
         <Stack flexDirection="row" alignItems="center" ml={isSm ? 0 : 4}>
-          <Typography level="body-md">
+          <Typography level="body-sm">
             {readLength}&nbsp;minute&nbsp;read
           </Typography>
         </Stack>
@@ -60,7 +62,7 @@ export default function PostHeader({
       {series && (
         <Stack mt={3}>
           <Typography>
-            <Link fontWeight="bold" href={seriesRoute(series.name)}>
+            <Link fontWeight="bold" href={seriesItemRoute(series.name)}>
               {series.name}
             </Link>
             &nbsp;series

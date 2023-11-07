@@ -20,10 +20,10 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const name = decodeClassName(id);
-  const series = await getTag(name);
+  const tag = await getTag(name);
   const metadata = await parent;
   return {
     ...(metadata as any),
-    title: `${series.name} | MythosSec`,
+    title: `${tag.name} | Mythos Security`,
   };
 }

@@ -25,10 +25,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "MythosSec",
+  title: "Mythos Security",
   metadataBase: new URL(`https://${process.env.DOMAIN}`),
-  description: "MythosSec",
-  applicationName: "MythosSec",
+  description: "Mythos Security",
+  applicationName: "Mythos Security",
   authors: [{ name: "Mythos" }],
   creator: "Mythos",
   manifest: "/site.webmanifest",

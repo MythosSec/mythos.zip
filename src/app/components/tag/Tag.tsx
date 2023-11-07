@@ -36,10 +36,9 @@ export default function Tag({
   return (
     <Stack>
       <Typography>Topic</Typography>
-      <Typography level="h1" ml={-0.3}>
+      <Typography level="h1" ml={-0.3} mb={15}>
         {name}
       </Typography>
-      <Divider sx={{ my: isSm ? 6 : 12 }} />
       <PostsScroller posts={rest} loading={loading} finished={finished} />
     </Stack>
   );
