@@ -1,9 +1,13 @@
 "use client";
-import { Stack, useTheme } from "@mui/joy";
+import { Stack, styled, useTheme } from "@mui/joy";
 import Header from "./Header";
 import Footer from "./Footer";
 import { ReactNode } from "react";
 import { TypeComponentSocials } from "../api/contentful/types";
+
+const Main = styled("main")`
+  flex: 1;
+`;
 
 export default function ContentRoot({
   socials,
@@ -19,6 +23,7 @@ export default function ContentRoot({
       width="100%"
       height="100%"
       maxWidth={1200}
+      minHeight="100vh"
       pl={4}
       pr={6}
       my={4}
@@ -34,7 +39,7 @@ export default function ContentRoot({
       }}
     >
       <Header mb={12} socials={socials} />
-      <main>{children}</main>
+      <Main>{children}</Main>
       <Footer pt={10} mt={30} mb={8} />
     </Stack>
   );

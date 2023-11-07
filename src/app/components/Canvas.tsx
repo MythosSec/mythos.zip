@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Color from "color";
 import { randomBetween } from "../util/math";
 import useAnimationFrame from "../hooks/useAnimationFrame";
-import { Box } from "@mui/joy";
+import { Box, useColorScheme } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
 import useScrollPercentage from "../hooks/useScrollPercentage";
 import { useWindowSize } from "@uidotdev/usehooks";
@@ -125,6 +125,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
   const { width, height } = useWindowSize();
   const [progress] = useScrollPercentage();
   const { height: docHeight } = useDocumentSize();
+  const { mode } = useColorScheme();
 
   // spawn particles
   useEffect(() => {
@@ -220,7 +221,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
       }
 
       // paint trail
-      if (particle.moveable) {
+      if (particle.moveable && mode === "dark") {
         for (let h = 0; h < particle.trailSize; h++) {
           const dX = particle.x - particle.vx * h;
           const dY = particle.y - particle.vy * h - top;
@@ -240,22 +241,25 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
 
       // determine pixel color
       let isPink = false;
-      for (let w = 0; w < particle.size; w++) {
-        for (let h = 0; h < particle.size; h++) {
-          const pixelIndex =
-            (~~(particle.x + w) + ~~(particle.y - top + h) * currentWidth) * 4;
-          const currentPixel = Color([
-            backgroundData.data[pixelIndex],
-            backgroundData.data[pixelIndex + 1],
-            backgroundData.data[pixelIndex + 2],
-          ]);
-          isPink = currentPixel.hue() > 220 && currentPixel.hue() < 340;
+      if (mode === "dark") {
+        for (let w = 0; w < particle.size; w++) {
+          for (let h = 0; h < particle.size; h++) {
+            const pixelIndex =
+              (~~(particle.x + w) + ~~(particle.y - top + h) * currentWidth) *
+              4;
+            const currentPixel = Color([
+              backgroundData.data[pixelIndex],
+              backgroundData.data[pixelIndex + 1],
+              backgroundData.data[pixelIndex + 2],
+            ]);
+            isPink = currentPixel.hue() > 220 && currentPixel.hue() < 340;
+            if (isPink) {
+              break;
+            }
+          }
           if (isPink) {
             break;
           }
-        }
-        if (isPink) {
-          break;
         }
       }
 
@@ -266,21 +270,28 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
           const pixelIndex =
             (~~(particle.x + w) + ~~(particle.y - top + h) * currentWidth) * 4;
 
-          const currentPixel = Color([
-            backgroundData.data[pixelIndex],
-            backgroundData.data[pixelIndex + 1],
-            backgroundData.data[pixelIndex + 2],
-          ]);
-          const nextPixel = isPink
-            ? currentPixel.lighten(1.2)
-            : currentPixel.lighten(7);
-          // starsData.data[pixelIndex] = 255;
-          // starsData.data[pixelIndex + 1] = 0;
-          // starsData.data[pixelIndex + 2] = 0;
-          starsData.data[pixelIndex] = nextPixel.red();
-          starsData.data[pixelIndex + 1] = nextPixel.green();
-          starsData.data[pixelIndex + 2] = nextPixel.blue();
-          starsData.data[pixelIndex + 3] = particle.brightness * 255;
+          if (mode === "dark") {
+            const currentPixel = Color([
+              backgroundData.data[pixelIndex],
+              backgroundData.data[pixelIndex + 1],
+              backgroundData.data[pixelIndex + 2],
+            ]);
+            const nextPixel = isPink
+              ? currentPixel.lighten(1.2)
+              : currentPixel.lighten(7);
+            // starsData.data[pixelIndex] = 255;
+            // starsData.data[pixelIndex + 1] = 0;
+            // starsData.data[pixelIndex + 2] = 0;
+            starsData.data[pixelIndex] = nextPixel.red();
+            starsData.data[pixelIndex + 1] = nextPixel.green();
+            starsData.data[pixelIndex + 2] = nextPixel.blue();
+            starsData.data[pixelIndex + 3] = particle.brightness * 255;
+          } else {
+            starsData.data[pixelIndex] = 0;
+            starsData.data[pixelIndex + 1] = 0;
+            starsData.data[pixelIndex + 2] = 0;
+            starsData.data[pixelIndex + 3] = particle.brightness * 255;
+          }
         }
       }
     }
@@ -297,43 +308,50 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
     canvas!.globalAlpha = 1;
     canvas?.clearRect(0, 0, currentWidth, currentHeight);
 
-    // draw base gradient
-    let gradient = canvas!.createLinearGradient(0, -top, 0, docHeight);
-    gradient.addColorStop(0, "rgb(4,0,25)");
-    gradient.addColorStop(1, "rgb(1,42,123)");
-    canvas!.fillStyle = gradient;
-    canvas!.fillRect(0, 0, currentWidth, currentHeight);
+    if (mode === "dark") {
+      // draw base gradient
+      let gradient = canvas!.createLinearGradient(0, -top, 0, docHeight);
+      gradient.addColorStop(0, "rgb(4,0,25)");
+      gradient.addColorStop(1, "rgb(1,42,123)");
+      canvas!.fillStyle = gradient;
+      canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
-    // draw vertical slide gradient
-    canvas!.globalAlpha = 0.7;
-    gradient = canvas!.createLinearGradient(
-      Math.floor(currentWidth * 0.55 + 500),
-      -200 - top,
-      Math.floor(currentWidth * 0.5 - 700),
-      -top
-    );
-    gradient.addColorStop(0.5, "rgb(160,7,198)");
-    // gradient.addColorStop(0.53, "rgb(160,7,198)");
-    // gradient.addColorStop(0.47, "rgb(160,7,198)");
-    gradient.addColorStop(0, "rgba(155,1,157,0");
-    gradient.addColorStop(1, "rgba(155,1,157,0");
-    canvas!.fillStyle = gradient;
-    canvas!.fillRect(0, 0, currentWidth, currentHeight);
+      // draw vertical slide gradient
+      canvas!.globalAlpha = 0.7;
+      gradient = canvas!.createLinearGradient(
+        Math.floor(currentWidth * 0.55 + 500),
+        -200 - top,
+        Math.floor(currentWidth * 0.5 - 700),
+        -top
+      );
+      gradient.addColorStop(0.5, "rgb(160,7,198)");
+      // gradient.addColorStop(0.53, "rgb(160,7,198)");
+      // gradient.addColorStop(0.47, "rgb(160,7,198)");
+      gradient.addColorStop(0, "rgba(155,1,157,0");
+      gradient.addColorStop(1, "rgba(155,1,157,0");
+      canvas!.fillStyle = gradient;
+      canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
-    // draw radial bottom gradient
-    canvas!.globalAlpha = 0.35;
-    gradient = canvas!.createRadialGradient(
-      Math.floor(currentWidth / 2 + 30),
-      Math.floor(docHeight * 0.9) - top,
-      0.1,
-      Math.floor(currentWidth / 2 + 30),
-      Math.floor(docHeight * 0.3) - top,
-      Math.floor(docHeight * 0.8)
-    );
-    gradient.addColorStop(0, "rgba(10,128,121,50)");
-    gradient.addColorStop(1, "rgba(10,128,121,0)");
-    canvas!.fillStyle = gradient;
-    canvas!.fillRect(0, 0, currentWidth, currentHeight);
+      // draw radial bottom gradient
+      canvas!.globalAlpha = 0.35;
+      gradient = canvas!.createRadialGradient(
+        Math.floor(currentWidth / 2 + 30),
+        Math.floor(docHeight * 0.9) - top,
+        0.1,
+        Math.floor(currentWidth / 2 + 30),
+        Math.floor(docHeight * 0.3) - top,
+        Math.floor(docHeight * 0.8)
+      );
+      gradient.addColorStop(0, "rgba(10,128,121,50)");
+      gradient.addColorStop(1, "rgba(10,128,121,0)");
+      canvas!.fillStyle = gradient;
+      canvas!.fillRect(0, 0, currentWidth, currentHeight);
+    } else {
+      const gradient = canvas!.createLinearGradient(0, 0, 0, docHeight);
+      gradient.addColorStop(0, "rgb(255,255,255)");
+      canvas!.fillStyle = gradient;
+      canvas!.fillRect(0, 0, currentWidth, currentHeight);
+    }
 
     canvas!.globalAlpha = 1;
   };

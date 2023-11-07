@@ -5,7 +5,7 @@ export default function About(props: StackProps) {
     <Stack {...props}>
       <Typography level="h4">Mythos Security</Typography>
       <Typography>
-        Welcome to Mythos Security. Here you'll find my musings on topics
+        Welcome to Mythos Security. Here you&apos;ll find my musings on topics
         related to cybersecurity, software and technology.
       </Typography>
     </Stack>

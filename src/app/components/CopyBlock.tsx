@@ -1,20 +1,24 @@
 "use client";
 import { ComponentProps } from "react";
-import { CopyBlock as CopyBlockLib, atomOneLight } from "react-code-blocks";
-import { Box, Stack, Typography } from "@mui/joy";
+import {
+  CopyBlock as CopyBlockLib,
+  atomOneLight,
+  atomOneDark,
+} from "react-code-blocks";
+import { Box, Stack, Typography, useColorScheme } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
 import Sheet from "./Sheet";
 
 function CopyBlock({
-  theme = atomOneLight,
   showLineNumbers = false,
   text,
   ...props
-}: ComponentProps<typeof CopyBlockLib> & {
+}: Omit<ComponentProps<typeof CopyBlockLib>, "theme"> & {
   showLineNumbers?: boolean;
   text: string;
 }) {
-  const fullProps = { theme, showLineNumbers, text, ...props };
+  const fullProps = { showLineNumbers, text, ...props };
+  const { mode } = useColorScheme();
   return (
     <ClientOnly
       fallback={
@@ -50,7 +54,10 @@ function CopyBlock({
           },
         }}
       >
-        <CopyBlockLib {...fullProps} />
+        <CopyBlockLib
+          {...fullProps}
+          theme={mode === "dark" ? atomOneLight : atomOneDark}
+        />
       </Stack>
     </ClientOnly>
   );

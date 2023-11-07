@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useScrollPercentage from "./useScrollPercentage";
 
 export default function useScrollThreshold({
-  threshold = 75,
+  threshold = 70,
   onThresholdMet,
 }: {
   threshold?: number;

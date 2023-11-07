@@ -1,13 +1,17 @@
 "use client";
 import { ComponentProps } from "react";
-import { CodeBlock as CodeBlockLib, atomOneLight } from "react-code-blocks";
-import { Stack } from "@mui/joy";
+import {
+  CodeBlock as CodeBlockLib,
+  atomOneLight,
+  atomOneDark,
+} from "react-code-blocks";
+import { Stack, useColorScheme } from "@mui/joy";
 import ClientOnly from "./ClientOnly";
 
 function CodeBlock({
-  theme = atomOneLight,
   ...props
-}: ComponentProps<typeof CodeBlockLib>) {
+}: Omit<ComponentProps<typeof CodeBlockLib>, "theme">) {
+  const { mode } = useColorScheme();
   return (
     <ClientOnly>
       <Stack
@@ -28,7 +32,10 @@ function CodeBlock({
           },
         }}
       >
-        <CodeBlockLib {...props} theme={theme} />
+        <CodeBlockLib
+          {...props}
+          theme={mode === "dark" ? atomOneLight : atomOneDark}
+        />
       </Stack>
     </ClientOnly>
   );

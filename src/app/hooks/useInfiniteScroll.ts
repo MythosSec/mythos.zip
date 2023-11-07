@@ -6,10 +6,12 @@ export default function useInfiniteScroll<
   T extends { skip: number; limit: number; total: number; items: K[] },
 >({
   initialData = [],
-  threshold = 75,
+  initialFinished = false,
+  threshold = 70,
   fetch,
 }: {
   initialData?: K[];
+  initialFinished?: boolean;
   threshold?: number;
   fetch: (limit: number, page: number) => Promise<T>;
 }) {
@@ -27,7 +29,15 @@ export default function useInfiniteScroll<
     loading: false,
   });
 
-  useEffect(() => setState((state) => ({ ...state, data: initialData })), []);
+  useEffect(
+    () =>
+      setState((state) => ({
+        ...state,
+        data: initialData,
+        finished: initialFinished,
+      })),
+    []
+  );
 
   const setData = useCallback(
     (data: T) =>

@@ -22,6 +22,7 @@ import Sheet from "./Sheet";
 import { useCallback, useState, useRef } from "react";
 import { homeRoute, seriesRoute, tagsRoute } from "../routes";
 import { TypeComponentSocials } from "../api/contentful/types";
+import ThemeToggle from "./ThemeToggle";
 
 const Popup = styled(Popper)({
   zIndex: 1000,
@@ -59,6 +60,7 @@ export default function Header({
     );
   }
 
+  // TODO: mobile hamburger menu
   return (
     <Stack
       flexDirection="row"
@@ -67,9 +69,10 @@ export default function Header({
       component="header"
     >
       <Stack width="30%" flexDirection="row" alignItems="center">
-        <Link href="#">
+        <Link href="#" mr={2}>
           <SearchIcon color="inherit" />
         </Link>
+        <ThemeToggle />
       </Stack>
       <Link href={homeRoute()}>
         <Logo size={60} />

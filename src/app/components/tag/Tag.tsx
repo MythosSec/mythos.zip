@@ -30,7 +30,12 @@ export default function Tag({
   const { data, loading, finished } = useInfiniteScroll<
     Omit<TypePageBlogPost, "content" | "featuredImage">,
     Awaited<ReturnType<typeof getBlogPosts>>
-  >({ initialData: initialPosts.items, fetch: fetchPosts });
+  >({
+    initialData: initialPosts.items,
+    initialFinished:
+      initialPosts.skip + initialPosts.limit >= initialPosts.total,
+    fetch: fetchPosts,
+  });
   const rest = data.length > 0 ? data : initialPosts.items;
 
   return (

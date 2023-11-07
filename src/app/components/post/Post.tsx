@@ -13,6 +13,7 @@ import {
   TypePageBlogPost,
 } from "@/app/api/contentful/types";
 import { getBlogPostBySlug } from "@/app/api/contentful";
+import PostSeries from "./PostSeries";
 
 const StyledStack = styled(Stack)<{ theme: Theme }>`
   & .left-gutter {
@@ -52,7 +53,7 @@ export default function Post({
 
   return (
     <PostContextProvider>
-      <ScrollProgress />
+      <ScrollProgress color={theme.palette.text.primary} />
       <StyledStack theme={theme}>
         <PostHeader
           mb={6}
@@ -71,6 +72,7 @@ export default function Post({
         />
         {isSm && <Divider sx={{ mt: 6 }} />}
         <PostTags mt={isSm ? 6 : 10} tags={post.tags} />
+        <PostSeries mt={6} series={post.series} />
         <PostSocials mt={6} socials={socials} />
         <Divider sx={{ mt: isSm ? 6 : 12 }} />
         <PostNavigation mt={8} next={next} previous={previous} />

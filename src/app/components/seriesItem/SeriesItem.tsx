@@ -1,9 +1,8 @@
 "use client";
 import { useCallback } from "react";
-import { Stack, Typography, Divider, useTheme } from "@mui/joy";
+import { Stack, Typography } from "@mui/joy";
 import { getBlogPosts } from "@/app/api/contentful";
 import useInfiniteScroll from "@/app/hooks/useInfiniteScroll";
-import { useMediaQuery } from "@mui/material";
 import { TypePageBlogPost } from "@/app/api/contentful/types";
 import PostsScroller from "../posts/PostsScroller";
 
@@ -16,9 +15,6 @@ export default function SeriesItem({
   id: string;
   initialPosts: Awaited<ReturnType<typeof getBlogPosts>>;
 }) {
-  const theme = useTheme();
-  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
-
   const fetchPosts = useCallback(async (limit: number, page: number) => {
     const response = await fetch(
       `/api/v1/getBlogPostsBySeriesId?seriesId=${id}&page=${page}&limit=${limit}`
@@ -30,7 +26,12 @@ export default function SeriesItem({
   const { data, loading, finished } = useInfiniteScroll<
     Omit<TypePageBlogPost, "content" | "featuredImage">,
     Awaited<ReturnType<typeof getBlogPosts>>
-  >({ initialData: initialPosts.items, fetch: fetchPosts });
+  >({
+    initialData: initialPosts.items,
+    initialFinished:
+      initialPosts.skip + initialPosts.limit >= initialPosts.total,
+    fetch: fetchPosts,
+  });
   const rest = data.length > 0 ? data : initialPosts.items;
 
   return (
