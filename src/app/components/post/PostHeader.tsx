@@ -1,7 +1,7 @@
 "use client";
 import { Link, Stack, StackProps, Typography, useTheme } from "@mui/joy";
 import { parsePostDate } from "@/app/util/date";
-import { authorRoute, seriesRoute } from "@/app/routes";
+import { seriesRoute } from "@/app/routes";
 import { useMediaQuery } from "@mui/material";
 import {
   TypeComponentAuthor,
@@ -30,9 +30,7 @@ export default function PostHeader({
     <Stack {...props}>
       <Stack mb={0.2}>
         <Typography>
-          <Link fontWeight="bold" href={authorRoute(author.name)}>
-            {author.name}
-          </Link>
+          {author.name}
           <Typography textColor="text.tertiary">&nbsp;—&nbsp;</Typography>
           <Typography>{parsePostDate(publishedDate)}</Typography>
         </Typography>

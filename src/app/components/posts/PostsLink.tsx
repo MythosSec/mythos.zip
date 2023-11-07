@@ -4,14 +4,14 @@ import { articleRoute, seriesRoute } from "@/app/routes";
 import { parsePostDate } from "@/app/util/date";
 import { useMediaQuery } from "@mui/material";
 import { Stack, Typography, Link, useTheme, StackProps } from "@mui/joy";
-import LinkN from "next/link";
 
 export default function PostsLink({
   post: { slug, shortDescription, title, series, publishedDate, readLength },
+  showSeries = true,
   ...props
 }: {
   post: Awaited<ReturnType<typeof getBlogPosts>>["items"][0];
-} & StackProps) {
+} & StackProps & { showSeries?: boolean }) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   return (
@@ -52,7 +52,7 @@ export default function PostsLink({
           </Stack>
         </Stack>
       </Link>
-      {series && (
+      {series && showSeries && (
         <Stack mt={3}>
           <Typography>
             <Link fontWeight="bold" href={seriesRoute(series.name)}>

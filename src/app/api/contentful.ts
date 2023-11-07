@@ -12,6 +12,14 @@ import {
 } from "./contentful/types/TypeComponentSocialMediaBlock";
 import { TypeComponentSeo, TypeComponentAuthor } from "./contentful/types";
 import { calculateReadLength } from "../util/contentful";
+import {
+  TypeComponentTagSkeleton,
+  deserializeTag,
+} from "./contentful/types/TypeComponentTag";
+import {
+  TypeComponentSeriesSkeleton,
+  deserializeSeries,
+} from "./contentful/types/TypeComponentSeries";
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -30,16 +38,18 @@ export const getBlogPosts = async (limit = 10, page = 1) => {
     order: ["-fields.publishedDate"],
     "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
     limit,
+    include: 1,
     skip: (page - 1) * limit,
   } as any);
-  const items = response.items;
+  delete response.includes;
   return {
     ...response,
-    items: items.map((item) => {
-      const deserialized = deserializeBlogPost(item);
+    items: response.items.map((item) => {
+      const { content, featuredImage, ...deserialized } =
+        deserializeBlogPost(item);
       return {
         ...deserialized,
-        readLength: getReadLength(deserialized),
+        readLength: getReadLength({ content, featuredImage, ...deserialized }),
       };
     }),
   };
@@ -70,18 +80,124 @@ export const getBlogPostBySlug = async (slug: string) => {
   };
 };
 
+export const getBlogPostsByTagId = async (
+  tagId: string,
+  limit = 10,
+  page = 1
+) => {
+  const response = await client.getEntries<TypePageBlogPostSkeleton>({
+    content_type: "pageBlogPost",
+    links_to_entry: tagId,
+    order: ["-fields.publishedDate"],
+    "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
+    limit,
+    skip: (page - 1) * limit,
+    include: 1,
+  } as any);
+  delete response.includes;
+  return {
+    ...response,
+    items: response.items.map((item) => {
+      const { content, featuredImage, ...deserialized } =
+        deserializeBlogPost(item);
+      return {
+        ...deserialized,
+        readLength: getReadLength({ content, featuredImage, ...deserialized }),
+      };
+    }),
+  };
+};
+
+export const getTags = async () => {
+  const response = await client.getEntries<TypeComponentTagSkeleton>({
+    content_type: "componentTag",
+    order: ["fields.name"],
+  } as any);
+  delete response.includes;
+  return {
+    ...response,
+    items: response.items.map((item) => {
+      const { internalName, ...deserialized } = deserializeTag(item);
+      return deserialized;
+    }),
+  };
+};
+
+export const getTag = async (tag: string) => {
+  const response = await client.getEntries<TypeComponentTagSkeleton>({
+    content_type: "componentTag",
+    "fields.name[match]": tag,
+  } as any);
+  const [item] = response.items.filter((item) => item.fields.name === tag);
+  return { ...deserializeTag(item), id: item.sys.id };
+};
+
+export const getSeries = async () => {
+  const response = await client.getEntries<TypeComponentSeriesSkeleton>({
+    content_type: "componentSeries",
+    order: ["fields.name"],
+  } as any);
+  delete response.includes;
+  return {
+    ...response,
+    items: response.items.map((item) => {
+      const { internalName, ...deserialized } = deserializeSeries(item);
+      return deserialized;
+    }),
+  };
+};
+
+export const getSeriesItem = async (series: string) => {
+  const response = await client.getEntries<TypeComponentSeriesSkeleton>({
+    content_type: "componentSeries",
+    "fields.name[match]": series,
+  } as any);
+  const [item] = response.items.filter((item) => item.fields.name === series);
+  return { ...deserializeSeries(item), id: item.sys.id };
+};
+
+export const getBlogPostsBySeriesId = async (
+  seriesId: string,
+  limit = 10,
+  page = 1
+) => {
+  const response = await client.getEntries<TypePageBlogPostSkeleton>({
+    content_type: "pageBlogPost",
+    links_to_entry: seriesId,
+    order: ["-fields.publishedDate"],
+    "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
+    limit,
+    skip: (page - 1) * limit,
+    include: 1,
+  } as any);
+  delete response.includes;
+  return {
+    ...response,
+    items: response.items.map((item) => {
+      const { content, featuredImage, ...deserialized } =
+        deserializeBlogPost(item);
+      return {
+        ...deserialized,
+        readLength: getReadLength({ content, featuredImage, ...deserialized }),
+      };
+    }),
+  };
+};
+
 export const getSurroundingBlogPosts = async (publishedDate: DateType) => {
   const [nextResponse, previousResponse] = await Promise.all([
     client.getEntries<TypePageBlogPostSkeleton>({
       content_type: "pageBlogPost",
       "fields.publishedDate[gt]": publishedDate,
       "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
+      order: ["-fields.publishedDate"],
       select: ["fields.slug", "fields.title"],
       limit: 1,
     } as any),
     client.getEntries<TypePageBlogPostSkeleton>({
       content_type: "pageBlogPost",
       "fields.publishedDate[lt]": publishedDate,
+      order: ["-fields.publishedDate"],
       select: ["fields.slug", "fields.title"],
       limit: 1,
     } as any),

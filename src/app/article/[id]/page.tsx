@@ -5,7 +5,6 @@ import {
   getSurroundingBlogPosts,
 } from "@/app/api/contentful";
 import Post from "@/app/components/post/Post";
-import { calculateReadLength } from "@/app/util/contentful";
 import { Metadata, ResolvingMetadata } from "next";
 
 export default async function BlogPost({

@@ -1,5 +1,5 @@
 import { Document } from "@contentful/rich-text-types";
-import type { Asset, Entry, EntryFields } from "contentful";
+import type { Asset, Entry, EntryCollection, EntryFields } from "contentful";
 import {
   deserializeAuthor,
   type TypeComponentAuthor,
@@ -35,6 +35,7 @@ export interface TypePageBlogPost {
   featuredImage: Asset;
   showFeaturedImage: boolean;
   seoFields: TypeComponentSeo;
+  readLength: number;
 }
 
 export interface TypePageBlogPostFields {
@@ -57,6 +58,9 @@ export type TypePageBlogPostSkeleton = {
   fields: TypePageBlogPostFields;
   contentTypeId: "pageBlogPost";
 };
+
+export type TypePageBlogPostCollection =
+  EntryCollection<TypePageBlogPostSkeleton>;
 
 export type TypePageBlogPostEntry = Entry<
   TypePageBlogPostSkeleton,

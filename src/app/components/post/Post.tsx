@@ -28,7 +28,7 @@ const StyledStack = styled(Stack)<{ theme: Theme }>`
   }
 
   & .right-gutter {
-    width: 100%;
+    min-width: 0;
 
     ${({ theme }) => theme.breakpoints.down("sm")} {
       padding: 0;
@@ -49,6 +49,7 @@ export default function Post({
 }) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <PostContextProvider>
       <ScrollProgress />

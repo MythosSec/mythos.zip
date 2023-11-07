@@ -25,6 +25,7 @@ export default function PostSocials({
       </Stack>
       <Stack className="right-gutter" flexDirection="row" px={4}>
         <LinkList
+          newWindow
           links={socials
             .filter(({ enabled }) => enabled)
             .map(({ link: url, name, enabled }) => ({

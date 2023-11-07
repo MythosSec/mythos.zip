@@ -19,14 +19,17 @@ export default function ContentRoot({
       width="100%"
       height="100%"
       maxWidth={1200}
-      mx={2}
+      pl={4}
+      pr={6}
       my={4}
       sx={{
         [theme.breakpoints.down("md")]: {
-          px: 6,
+          pl: 6,
+          pr: 8,
         },
         [theme.breakpoints.down("sm")]: {
-          px: 4,
+          pl: 4,
+          pr: 6,
         },
       }}
     >

@@ -1,6 +1,7 @@
 "use client";
 import useScrollTop from "@/app/hooks/useScrollTop";
 import { useWindowSize } from "@uidotdev/usehooks";
+import { useParams } from "next/navigation";
 import {
   createContext,
   ReactNode,
@@ -18,7 +19,6 @@ interface PostContextDispatch {
   addSectionHeaderRef:
     | ((key: string, ref: RefObject<HTMLParagraphElement>) => void)
     | null;
-  clearSectionHeaderRefs: (() => void) | null;
 }
 
 const defaultPostContextState = {
@@ -27,7 +27,6 @@ const defaultPostContextState = {
 };
 const defaultPostContextDispatch = {
   addSectionHeaderRef: null,
-  clearSectionHeaderRefs: null,
 };
 
 const PostContext = createContext<PostContextState & PostContextDispatch>({
@@ -44,6 +43,7 @@ export function PostContextProvider({
     useState<PostContextState>(defaultPostContextState);
   const [scrollTop, height] = useScrollTop();
   const { height: windowHeight } = useWindowSize();
+  const params = useParams();
 
   const addSectionHeaderRef = useCallback(
     (key: string, ref: RefObject<HTMLParagraphElement>) => {
@@ -58,10 +58,10 @@ export function PostContextProvider({
     [sectionHeaderRefs]
   );
 
-  const clearSectionHeaderRefs = useCallback(
-    () => setState((state) => ({ ...state, sectionHeaderRefs: new Map() })),
-    []
-  );
+  useEffect(() => {
+    // clear refs on route change
+    setState((state) => ({ ...state, sectionHeaderRefs: new Map() }));
+  }, [params]);
 
   useEffect(() => {
     if (windowHeight === null) {
@@ -99,7 +99,6 @@ export function PostContextProvider({
         sectionHeaderRefs,
         selectedSectionHeader,
         addSectionHeaderRef,
-        clearSectionHeaderRefs,
       }}
     >
       {children}

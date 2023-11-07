@@ -136,6 +136,10 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
         return;
       }
 
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].maxHeight = docHeight;
+      }
+
       const nextParticles: Particle[] = [...particles];
       if (isLonger) {
         const count = Math.floor(
@@ -300,7 +304,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
     canvas!.fillStyle = gradient;
     canvas!.fillRect(0, 0, currentWidth, currentHeight);
 
-    // // draw vertical slide gradient
+    // draw vertical slide gradient
     canvas!.globalAlpha = 0.7;
     gradient = canvas!.createLinearGradient(
       Math.floor(currentWidth * 0.55 + 500),
