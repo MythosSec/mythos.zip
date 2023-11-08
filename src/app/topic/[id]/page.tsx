@@ -8,7 +8,7 @@ export default async function TagPage({ params }: { params: { id: string } }) {
   const tag = await getTag(name);
   const posts = await getBlogPostsByTagId(tag.id);
 
-  return <Tag name={name} id={tag.id} initialPosts={posts} />;
+  return <Tag name={tag.name} id={tag.id} initialPosts={posts} />;
 }
 
 export async function generateMetadata(
@@ -24,6 +24,6 @@ export async function generateMetadata(
   const metadata = await parent;
   return {
     ...(metadata as any),
-    title: `${tag.name} | Mythos Security`,
+    title: tag.name,
   };
 }

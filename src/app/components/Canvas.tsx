@@ -4,7 +4,6 @@ import Color from "color";
 import { randomBetween } from "../util/math";
 import useAnimationFrame from "../hooks/useAnimationFrame";
 import { Box, useColorScheme } from "@mui/joy";
-import ClientOnly from "./ClientOnly";
 import useScrollPercentage from "../hooks/useScrollPercentage";
 import { useWindowSize } from "@uidotdev/usehooks";
 import useDocumentSize from "../hooks/useDocumentSize";
@@ -357,44 +356,42 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
   };
 
   return (
-    <ClientOnly>
-      <Box
-        sx={{
-          zIndex: 1,
+    <Box
+      sx={{
+        zIndex: 1,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        opacity: 0,
+        transition: "opacity 0.2s",
+        ...(!loading && { opacity: 1 }),
+      }}
+    >
+      <canvas
+        id="background"
+        ref={backgroundRef}
+        width={String(width)}
+        height={String(height)}
+        style={{
           position: "fixed",
           top: 0,
           left: 0,
-          opacity: 0,
-          transition: "opacity 0.2s",
-          ...(!loading && { opacity: 1 }),
+          zIndex: 1,
         }}
-      >
-        <canvas
-          id="background"
-          ref={backgroundRef}
-          width={String(width)}
-          height={String(height)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            zIndex: 1,
-          }}
-        />
-        <canvas
-          id="stars"
-          ref={starsRef}
-          width={String(width)}
-          height={String(height)}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 2,
-          }}
-        />
-      </Box>
-    </ClientOnly>
+      />
+      <canvas
+        id="stars"
+        ref={starsRef}
+        width={String(width)}
+        height={String(height)}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: 2,
+        }}
+      />
+    </Box>
   );
 }
 

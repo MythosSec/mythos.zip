@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Catamaran, Inconsolata } from "next/font/google";
 import ThemeRegistry from "./ThemeRegistry";
-import Canvas from "./components/Canvas";
 import { Stack } from "@mui/joy";
 import clsx from "clsx";
 import { getSocials } from "./api/contentful";
@@ -25,7 +24,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Mythos Security",
+  title: { default: "Mythos Security", template: "%s | Mythos Security" },
   metadataBase: new URL(`https://${process.env.DOMAIN}`),
   description: "Mythos Security",
   applicationName: "Mythos Security",
@@ -88,7 +87,6 @@ export default async function RootLayout({
               },
             }}
           >
-            <Canvas />
             <ContentRoot socials={socials}>{children}</ContentRoot>
           </Stack>
         </ThemeRegistry>

@@ -8,7 +8,6 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import useDocumentSize from "../hooks/useDocumentSize";
 
 export default function ScrollProgress({
-  color = "#fff",
   orientation = "vertical",
   size = 14,
   sx = {},
@@ -80,10 +79,10 @@ export default function ScrollProgress({
           height="100%"
           top={progressPct}
           position="absolute"
-          sx={{
-            background: color,
+          sx={(theme) => ({
+            background: theme.palette.text.primary,
             transform: "scaleY(-1)",
-          }}
+          })}
         />
       </Box>
     );
@@ -112,10 +111,10 @@ export default function ScrollProgress({
       <Box
         height={size}
         width={progressPct}
-        sx={{
-          background: color,
+        sx={(theme) => ({
+          background: theme.palette.text.primary,
           transform: "scaleY(-1)",
-        }}
+        })}
       />
     </Box>
   );

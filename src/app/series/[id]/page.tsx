@@ -12,7 +12,7 @@ export default async function SeriesPage({
   const series = await getSeriesItem(name);
   const posts = await getBlogPostsBySeriesId(series.id);
 
-  return <SeriesItem name={name} id={series.id} initialPosts={posts} />;
+  return <SeriesItem name={series.name} id={series.id} initialPosts={posts} />;
 }
 
 export async function generateMetadata(
@@ -28,6 +28,6 @@ export async function generateMetadata(
   const metadata = await parent;
   return {
     ...(metadata as any),
-    title: `${series.name} | Mythos Security`,
+    title: series.name,
   };
 }

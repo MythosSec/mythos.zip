@@ -83,6 +83,17 @@ const Theme = extendTheme({
         textColor: "text.primary",
       },
     },
+    JoySwitch: {
+      styleOverrides: {
+        track: {
+          background: "transparent",
+          border: `1px solid var(--joy-palette-text-primary)`,
+        },
+        thumb: {
+          background: "var(--joy-palette-text-primary)",
+        },
+      },
+    },
   },
 });
 

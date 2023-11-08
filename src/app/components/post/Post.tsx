@@ -1,6 +1,5 @@
 "use client";
 import { Divider, Stack, Theme, styled, useTheme } from "@mui/joy";
-import ScrollProgress from "../ScrollProgress";
 import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import { PostContextProvider } from "./usePostContext";
@@ -53,7 +52,6 @@ export default function Post({
 
   return (
     <PostContextProvider>
-      <ScrollProgress color={theme.palette.text.primary} />
       <StyledStack theme={theme}>
         <PostHeader
           mb={6}

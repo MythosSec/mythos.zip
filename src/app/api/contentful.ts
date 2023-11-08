@@ -72,7 +72,9 @@ export const getBlogPostBySlug = async (slug: string) => {
     "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
     include: 10,
   } as any);
-  const [item] = response.items.filter((item) => item.fields.slug === slug);
+  const [item] = response.items.filter(
+    (item) => (item.fields.slug as string).toLowerCase() === slug.toLowerCase()
+  );
   const deserialized = deserializeBlogPost(item);
   return {
     ...deserialized,
@@ -128,7 +130,9 @@ export const getTag = async (tag: string) => {
     content_type: "componentTag",
     "fields.name[match]": tag,
   } as any);
-  const [item] = response.items.filter((item) => item.fields.name === tag);
+  const [item] = response.items.filter(
+    (item) => (item.fields.name as string).toLowerCase() === tag.toLowerCase()
+  );
   return { ...deserializeTag(item), id: item.sys.id };
 };
 
@@ -152,7 +156,10 @@ export const getSeriesItem = async (series: string) => {
     content_type: "componentSeries",
     "fields.name[match]": series,
   } as any);
-  const [item] = response.items.filter((item) => item.fields.name === series);
+  const [item] = response.items.filter(
+    (item) =>
+      (item.fields.name as string).toLowerCase() === series.toLowerCase()
+  );
   return { ...deserializeSeries(item), id: item.sys.id };
 };
 

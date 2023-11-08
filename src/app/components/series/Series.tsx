@@ -1,3 +1,4 @@
+"use client";
 import { getSeries } from "@/app/api/contentful";
 import { Stack, Typography } from "@mui/joy";
 import SeriesLink from "./SeriesLink";
