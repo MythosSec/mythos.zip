@@ -5,7 +5,8 @@ import {
   atomOneLight,
   atomOneDark,
 } from "react-code-blocks";
-import { Box, Stack, Typography, useColorScheme } from "@mui/joy";
+import { Box, Stack, Typography } from "@mui/joy";
+import { useColorScheme } from "@mui/joy/styles";
 import ClientOnly from "./ClientOnly";
 import Sheet from "./Sheet";
 

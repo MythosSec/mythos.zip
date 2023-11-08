@@ -1,5 +1,6 @@
 "use client";
-import { Sheet as JoySheet, SheetProps, useColorScheme } from "@mui/joy";
+import { Sheet as JoySheet, SheetProps } from "@mui/joy";
+import { useColorScheme } from "@mui/joy/styles";
 
 export default function Sheet({
   sx = {},
@@ -13,7 +14,7 @@ export default function Sheet({
   background?: "dark" | "light";
 }) {
   const { mode } = useColorScheme();
-  if (variant === "glass" && mode === "dark") {
+  if (variant === "glass") {
     return (
       <JoySheet
         sx={{
@@ -33,10 +34,6 @@ export default function Sheet({
   }
 
   return (
-    <JoySheet
-      sx={{ borderRadius: 8, ...sx }}
-      variant={variant === "glass" ? "outlined" : variant}
-      {...props}
-    />
+    <JoySheet sx={{ borderRadius: 8, ...sx }} variant={variant} {...props} />
   );
 }

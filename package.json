@@ -24,7 +24,7 @@
     "contentful": "^10.6.5",
     "contentful-management": "^11.3.0",
     "date-fns": "^2.30.0",
-    "next": "14.0.0",
+    "next": "^14.0.1",
     "react": "^18",
     "react-code-blocks": "^0.1.4",
     "react-dom": "^18",

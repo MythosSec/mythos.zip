@@ -29,8 +29,8 @@ const client = createClient({
 
 type DateType = `${number}-${number}-${number}T${number}:${number}:${number}Z`;
 
-const getReadLength = (post: TypePageBlogPost) =>
-  Math.max(Math.floor(calculateReadLength(post.content)), 1);
+const getReadLength = (post: TypePageBlogPost | undefined) =>
+  post ? Math.max(Math.floor(calculateReadLength(post.content)), 1) : 0;
 
 export const getBlogPosts = async (limit = 10, page = 1) => {
   const response = await client.getEntries<TypePageBlogPostSkeleton>({
@@ -52,6 +52,20 @@ export const getBlogPosts = async (limit = 10, page = 1) => {
         readLength: getReadLength({ content, featuredImage, ...deserialized }),
       };
     }),
+  };
+};
+
+export const getAllBlogPosts = async () => {
+  const response = await client.getEntries<TypePageBlogPostSkeleton>({
+    content_type: "pageBlogPost",
+    order: ["-fields.publishedDate"],
+    "fields.publishedDate[lt]": formatISO(new Date()) as DateType,
+    include: 1,
+  } as any);
+  delete response.includes;
+  return {
+    ...response,
+    items: response.items.map((item) => deserializeBlogPost(item)),
   };
 };
 
@@ -133,6 +147,9 @@ export const getTag = async (tag: string) => {
   const [item] = response.items.filter(
     (item) => (item.fields.name as string).toLowerCase() === tag.toLowerCase()
   );
+  if (!item) {
+    return undefined;
+  }
   return { ...deserializeTag(item), id: item.sys.id };
 };
 
@@ -160,6 +177,9 @@ export const getSeriesItem = async (series: string) => {
     (item) =>
       (item.fields.name as string).toLowerCase() === series.toLowerCase()
   );
+  if (!item) {
+    return undefined;
+  }
   return { ...deserializeSeries(item), id: item.sys.id };
 };
 

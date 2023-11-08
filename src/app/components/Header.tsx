@@ -69,9 +69,9 @@ export default function Header({
       component="header"
     >
       <Stack width="30%" flexDirection="row" alignItems="center">
-        <Link href="#" mr={2}>
+        {/* <Link href="#" mr={2}>
           <SearchIcon color="inherit" />
-        </Link>
+        </Link> */}
         <ThemeToggle />
       </Stack>
       <Link href={homeRoute()}>
@@ -109,7 +109,7 @@ export default function Header({
               color="neutral"
               onClick={onOpen}
               size="sm"
-              sx={{ backgroundColor: "transparent !important", px: 0 }}
+              sx={{ border: "none", px: 0 }}
             >
               <Typography level="title-sm">Contact</Typography>
             </Button>

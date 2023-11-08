@@ -94,6 +94,17 @@ const Theme = extendTheme({
         },
       },
     },
+    JoyButton: {
+      styleOverrides: {
+        root: {
+          background: "transparent",
+          border: `1px solid var(--joy-palette-text-primary)`,
+          "&:hover": {
+            background: "transparent",
+          },
+        },
+      },
+    },
   },
 });
 

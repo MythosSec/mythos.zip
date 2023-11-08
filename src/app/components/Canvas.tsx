@@ -347,7 +347,7 @@ function Canvas({ pxPerStar = 8000 }: { pxPerStar?: number }) {
       canvas!.fillRect(0, 0, currentWidth, currentHeight);
     } else {
       const gradient = canvas!.createLinearGradient(0, 0, 0, docHeight);
-      gradient.addColorStop(0, "rgb(255,255,255)");
+      gradient.addColorStop(0, "rgb(239, 239, 239)");
       canvas!.fillStyle = gradient;
       canvas!.fillRect(0, 0, currentWidth, currentHeight);
     }
