@@ -1,10 +1,11 @@
 "use client";
 import { useCallback } from "react";
-import { Stack, Typography } from "@mui/joy";
+import { Button, Link, Stack, Typography } from "@mui/joy";
 import { getBlogPosts } from "@/app/api/contentful";
 import useInfiniteScroll from "@/app/hooks/useInfiniteScroll";
 import { TypePageBlogPost } from "@/app/api/contentful/types";
 import PostsScroller from "../posts/PostsScroller";
+import { homeRoute } from "@/app/routes";
 
 export default function SeriesItem({
   name,
@@ -40,12 +41,22 @@ export default function SeriesItem({
       <Typography level="h1" ml={-0.3} mb={15}>
         {name}
       </Typography>
-      <PostsScroller
-        posts={rest}
-        loading={loading}
-        finished={finished}
-        showSeries={false}
-      />
+      {initialPosts.items.length === 0 && (
+        <>
+          <Typography>No articles to see here.</Typography>
+          <Link href={homeRoute()} mt={1}>
+            <Button>Home</Button>
+          </Link>
+        </>
+      )}
+      {initialPosts.items.length > 0 && (
+        <PostsScroller
+          posts={rest}
+          loading={loading}
+          finished={finished}
+          showSeries={false}
+        />
+      )}
     </Stack>
   );
 }

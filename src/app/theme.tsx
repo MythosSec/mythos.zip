@@ -98,6 +98,7 @@ const Theme = extendTheme({
       styleOverrides: {
         root: {
           background: "transparent",
+          color: "var(--joy-palette-text-primary)",
           border: `1px solid var(--joy-palette-text-primary)`,
           "&:hover": {
             background: "transparent",

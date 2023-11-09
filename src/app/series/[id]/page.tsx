@@ -21,6 +21,7 @@ export default async function SeriesPage({
   }
 
   const posts = await getBlogPostsBySeriesId(series.id);
+
   return <SeriesItem name={series.name} id={series.id} initialPosts={posts} />;
 }
 
