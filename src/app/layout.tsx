@@ -23,13 +23,17 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+const title = "Mythos Security";
+const description = "Mythos Security";
+const author = "Mythos";
+
 export const metadata: Metadata = {
-  title: { default: "Mythos Security", template: "%s | Mythos Security" },
+  title: { default: title, template: `%s | ${title}` },
   metadataBase: new URL(`https://${process.env.DOMAIN}`),
-  description: "Mythos Security",
-  applicationName: "Mythos Security",
-  authors: [{ name: "Mythos" }],
-  creator: "Mythos",
+  description,
+  applicationName: title,
+  authors: [{ name: author }],
+  creator: author,
   manifest: "/site.webmanifest",
   icons: {
     icon: ["/favicon.ico"],
@@ -61,6 +65,26 @@ export const metadata: Metadata = {
         sizes: "16x16",
       },
     ],
+  },
+  twitter: {
+    title,
+    description,
+    creator: "@MythosSec",
+    card: "summary_large_image",
+    images: ["/share.png"],
+  },
+  openGraph: {
+    title,
+    description,
+    siteName: title,
+    type: "website",
+    images: ["/share.png"],
+  },
+  appLinks: {
+    web: {
+      url: `https://${process.env.DOMAIN}`,
+      should_fallback: true,
+    },
   },
 };
 

@@ -250,7 +250,9 @@ export const parseMetadata = ({
   openGraph,
   robots,
   name: author,
-}: TypeComponentSeo & TypeComponentAuthor & { locale?: string }): Metadata => ({
+  imageUrl,
+}: TypeComponentSeo &
+  TypeComponentAuthor & { locale?: string; imageUrl: string }): Metadata => ({
   title: pageTitle,
   description: pageDescription,
   applicationName,
@@ -281,6 +283,7 @@ export const parseMetadata = ({
     creator: twitter.creator,
     creatorId: twitter.creatorId,
     card: twitter.card,
+    images: [imageUrl],
   },
   openGraph: {
     title: openGraph.title,
@@ -288,6 +291,7 @@ export const parseMetadata = ({
     siteName: openGraph.siteName,
     locale,
     type: "website",
+    images: [imageUrl],
   },
   appLinks: {
     web: {

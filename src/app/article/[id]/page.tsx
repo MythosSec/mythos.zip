@@ -47,6 +47,7 @@ export async function generateMetadata(
     ...parseMetadata({
       ...post.seoFields,
       ...post.author,
+      imageUrl: post.featuredImage.fields.file?.url as string,
     }),
   };
 }
